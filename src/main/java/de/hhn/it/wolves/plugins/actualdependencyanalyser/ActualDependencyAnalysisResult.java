@@ -10,10 +10,12 @@ public class ActualDependencyAnalysisResult extends AnalysisResult {
 
     private final List<Artifact> unusedDependencies;
 
+
     public ActualDependencyAnalysisResult(RepositoryInformation repositoryInformation, String analysisPluginname, List<Artifact> unusedDependencies) {
         super(repositoryInformation, analysisPluginname);
         this.unusedDependencies = unusedDependencies;
     }
+
     public List<Artifact> getUnusedDependencies() {
         return unusedDependencies;
     }
