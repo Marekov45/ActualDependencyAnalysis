@@ -66,19 +66,25 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                 request.setGoals(Collections.singletonList("dependency:analyze"));
 
                 Invoker invoker = new DefaultInvoker();
+
+                ArrayList<String> mavenPluginOutput = new ArrayList<>();
                 List<Artifact> artifacts = new ArrayList<>();
                 try {
                     //invoker.setMavenHome(new File(System.getenv("MAVEN_HOME")));
                     invoker.setOutputHandler(new InvocationOutputHandler() {
                         @Override
                         public void consumeLine(String line) throws IOException {
-                            if (line.startsWith("[WARNING]    "))
-                                artifacts.add((buildArtifactFromString(line)));
+                            if (line.startsWith("[WARNING]")) {
+                                mavenPluginOutput.add(line);
+                            }
                         }
                     });
                     invoker.execute(request);
                 } catch (MavenInvocationException e) {
                     e.printStackTrace();
+                }
+                for (int i = getUnusedDependencyIndex(mavenPluginOutput) + 1; i < mavenPluginOutput.size(); i++) {
+                    artifacts.add(buildArtifactFromString(mavenPluginOutput, i));
                 }
                 return new MavenDependencyAnalysisResult(repositoryInformation, getUniqueName(), artifacts);
 
@@ -119,7 +125,22 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
         return new AnalysisResultWithoutProcessing(repositoryInformation, getUniqueName());
     }
 
-    private Artifact buildArtifactFromString(String line) {
+
+    private int getUnusedDependencyIndex(ArrayList<String> output) {
+        String text = "[WARNING] Unused declared dependencies found:";
+        int index = 0;
+        int counter = 0;
+        for (String start : output) {
+            if (start.equals(text)) {
+                index = counter;
+            }
+            counter++;
+        }
+        return index;
+    }
+
+    private Artifact buildArtifactFromString(ArrayList<String> pluginOutput, int unusedDependencyIndex) {
+        String line = pluginOutput.get(unusedDependencyIndex);
         String splitValues[] = line.split(":|\\s+");
         String groupId = splitValues[1];
         String artifactId = splitValues[2];
