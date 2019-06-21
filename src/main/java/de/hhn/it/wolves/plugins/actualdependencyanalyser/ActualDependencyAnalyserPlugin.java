@@ -23,6 +23,7 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
     private static final Logger logger = LoggerFactory.getLogger(ActualDependencyAnalyserPlugin.class.getName());
     private static final String CONFIG_FILE_NAME = "/mavendependency.properties";
     private static final String POM_FILE = "/pom.xml";
+    private static final String JSON_FILE = "/package.json";
     private File workingDirectory;
     private Properties properties;
 
@@ -52,7 +53,6 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
     }
 
     public AnalysisResult analyseRepository(RepositoryInformation repositoryInformation) {
-        List<Artifact> artifacts = new ArrayList<>();
         switch (repositoryInformation.getProgrammingLanguage()) {
             case JAVA:
 
@@ -66,24 +66,28 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                 request.setGoals(Collections.singletonList("dependency:analyze"));
 
                 Invoker invoker = new DefaultInvoker();
-
+                List<Artifact> artifacts = new ArrayList<>();
                 try {
-                    //   invoker.setMavenHome(new File(System.getenv("MAVEN_HOME")));
+                    //invoker.setMavenHome(new File(System.getenv("MAVEN_HOME")));
                     invoker.setOutputHandler(new InvocationOutputHandler() {
                         @Override
                         public void consumeLine(String line) throws IOException {
                             if (line.startsWith("[WARNING]    "))
-                                //  System.out.println(line);
                                 artifacts.add((buildArtifactFromString(line)));
-
                         }
                     });
                     invoker.execute(request);
                 } catch (MavenInvocationException e) {
                     e.printStackTrace();
                 }
-                break;
+                return new MavenDependencyAnalysisResult(repositoryInformation, getUniqueName(), artifacts);
+
             case JAVA_SCRIPT:
+                File packageJSONFile = new File(repositoryInformation.getLocalDownloadPath() + JSON_FILE);
+                if (!packageJSONFile.exists()) {
+                    logger.info("We could not a find a package.json file for this project, thus it will be excluded from the analysis.");
+                    return new AnalysisResultWithoutProcessing(repositoryInformation, getUniqueName());
+                }
                 ProcessBuilder pb = new ProcessBuilder("cmd", "/c", "depcheck");
                 pb.directory(repositoryInformation.getLocalDownloadPath());
                 pb.redirectErrorStream(true);
@@ -108,11 +112,11 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                         dependencies.add(dependency);
                     }
                 }
-                break;
+                return new NodeDependencyAnalysisResult(repositoryInformation, getUniqueName(), dependencies);
         }
 
-        // hier werden momentan nur die maven dependencies übergeben die vom Typ Artifact sind
-        return new ActualDependencyAnalysisResult(repositoryInformation, getUniqueName(), artifacts);
+        logger.error("This part should never been reached");
+        return new AnalysisResultWithoutProcessing(repositoryInformation, getUniqueName());
     }
 
     private Artifact buildArtifactFromString(String line) {
