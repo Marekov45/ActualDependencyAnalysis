@@ -83,7 +83,8 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                 } catch (MavenInvocationException e) {
                     e.printStackTrace();
                 }
-                for (int i = getUnusedDependencyIndex(mavenPluginOutput) + 1; i < mavenPluginOutput.size(); i++) {
+                String mavenText = "[WARNING] Unused declared dependencies found:";
+                for (int i = getUnusedDependencyIndex(mavenPluginOutput,mavenText) + 1; i < mavenPluginOutput.size(); i++) {
                     artifacts.add(buildArtifactFromString(mavenPluginOutput, i));
                 }
                 return new MavenDependencyAnalysisResult(repositoryInformation, getUniqueName(), artifacts);
@@ -104,7 +105,8 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                     e.printStackTrace();
                 }
                 BufferedReader input = new BufferedReader((new InputStreamReader(p.getInputStream())));
-                ArrayList<String> dependencies = new ArrayList<>();  // Welchen Typ sollte die dependencies für NodeJS am besten haben?
+                ArrayList<String> allDependencies = new ArrayList<>();
+                ArrayList<String> unusedDependencies = new ArrayList<>();// Welchen Typ sollte die dependencies für NodeJS am besten haben?
                 String line = null;
                 while (true) {
                     try {
@@ -112,13 +114,20 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    if (line.startsWith("*")) {
-                        String split[] = line.split("\\s");
-                        String dependency = split[1];
-                        dependencies.add(dependency);
-                    }
+                   // if (line.startsWith("*")) {
+                       // String split[] = line.split("\\s");
+                       // String dependency = split[1];
+                       // dependencies.add(dependency);
+                        allDependencies.add(line);
+                   // }
                 }
-                return new NodeDependencyAnalysisResult(repositoryInformation, getUniqueName(), dependencies);
+                allDependencies.remove("Unused dependencies");
+                allDependencies.remove("Unused devDependencies");
+                String depcheckText = "Missing dependencies";
+                for (int i = 0; i < getUnusedDependencyIndex(allDependencies,depcheckText); i++) {
+                    unusedDependencies.add(allDependencies.get(i));
+                }
+                return new NodeDependencyAnalysisResult(repositoryInformation, getUniqueName(), unusedDependencies);
         }
 
         logger.error("This part should never been reached");
@@ -126,8 +135,8 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
     }
 
 
-    private int getUnusedDependencyIndex(ArrayList<String> output) {
-        String text = "[WARNING] Unused declared dependencies found:";
+    private int getUnusedDependencyIndex(ArrayList<String> output,String startingPoint) {
+        String text = startingPoint;
         int index = 0;
         int counter = 0;
         for (String start : output) {
