@@ -6,7 +6,13 @@
 
     <groupId>de.hhn.ai.ss19.rekovsky</groupId>
     <artifactId>wolves-plugin</artifactId>
+    <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
+    <modules>
+        <module>actual-dependency-analyser</module>
+        <module>actual-dependency-analysis-result-consumer</module>
+        <module>actual-dependency-analysis-stats-generator</module>
+    </modules>
 
     <dependencies>
         <dependency>

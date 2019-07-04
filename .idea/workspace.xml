@@ -2,11 +2,18 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c9f7aba8-f6fe-4cdb-8f90-f41044d2f9cb" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/ActualDependencyAnalyserPlugin.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/ActualDependencyAnalyserPlugin.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/ActualDependencyAnalyserPlugin.java" beforeDir="false" afterPath="$PROJECT_DIR$/actual-dependency-analyser/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/ActualDependencyAnalyserPlugin.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/MavenDependencyAnalysisResult.java" beforeDir="false" afterPath="$PROJECT_DIR$/actual-dependency-analyser/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/MavenDependencyAnalysisResult.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/NodeDependencyAnalysisResult.java" beforeDir="false" afterPath="$PROJECT_DIR$/actual-dependency-analyser/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/NodeDependencyAnalysisResult.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
+    <ignored path="$PROJECT_DIR$/actual-dependency-analyser/target/" />
+    <ignored path="$PROJECT_DIR$/actual-dependency-analysis-result-consumer/target/" />
+    <ignored path="$PROJECT_DIR$/actual-dependency-analysis-stats-generator/target/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -18,34 +25,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/pom.xml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="697">
-              <caret line="41" column="32" selection-start-line="41" selection-start-column="32" selection-end-line="41" selection-end-column="32" />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/ActualDependencyAnalyserPlugin.java">
+        <entry file="file://$PROJECT_DIR$/actual-dependency-analyser/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/ActualDependencyAnalyserPlugin.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="374">
-              <caret line="116" column="46" selection-start-line="116" selection-start-column="46" selection-end-line="116" selection-end-column="46" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#8110#8111#0" expanded="true" />
-                <element signature="e#8144#8145#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/NodeDependencyAnalysisResult.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="136">
-              <caret line="12" selection-start-line="12" selection-end-line="12" />
+            <state relative-caret-position="721">
+              <caret line="157" column="5" lean-forward="true" selection-start-line="157" selection-start-column="5" selection-end-line="157" selection-end-column="5" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -54,12 +38,19 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/MavenDependencyAnalysisResult.java">
+        <entry file="file://$PROJECT_DIR$/actual-dependency-analysis-stats-generator/pom.xml">
+          <provider selected="true" editor-type-id="text-editor" />
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/actual-dependency-analysis-stats-generator/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalysisstatsgeneration/ActualDependencyAnalysisStatsGenerator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="68">
-              <caret line="8" selection-start-line="8" selection-end-line="21" selection-end-column="1" />
+            <state relative-caret-position="323">
+              <caret line="34" selection-start-line="34" selection-end-line="34" />
               <folding>
                 <element signature="imports" expanded="true" />
+                <element signature="e#3458#3459#0" expanded="true" />
+                <element signature="e#3492#3493#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -76,16 +67,30 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/ActualDependencyAnalsisResult.java" />
         <option value="$PROJECT_DIR$/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/ActualDependencyAnalysisResult.java" />
         <option value="$PROJECT_DIR$/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/MavenDependencyAnalysisResult.java" />
         <option value="$PROJECT_DIR$/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/NodeDependencyAnalysisResult.java" />
         <option value="$PROJECT_DIR$/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/ActualDependencyAnalyserPlugin.java" />
+        <option value="$PROJECT_DIR$/actual-dependency-analysis-result-consumer/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalysisprocessing/ActualDependencyStatisticInformation.java" />
+        <option value="$PROJECT_DIR$/actual-dependency-analysis-result-consumer/pom.xml" />
+        <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/actual-dependency-analysis-stats-generator/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalysisstatsgeneration/ActualDependencyAnalysisStatsGenerator.java" />
+        <option value="$PROJECT_DIR$/actual-dependency-analyser/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/ActualDependencyAnalyserPlugin.java" />
+        <option value="$PROJECT_DIR$/actual-dependency-analyser/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/NodeDependencyAnalysisResult.java" />
+        <option value="$PROJECT_DIR$/actual-dependency-analyser/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/MavenDependencyAnalysisResult.java" />
+        <option value="$PROJECT_DIR$/actual-dependency-analysis-result-consumer/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalysisprocessing/ActualDependencyAnalysisResultConsumer.java" />
+        <option value="$PROJECT_DIR$/actual-dependency-analysis-result-consumer/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalysisprocessing/MavenDependencyStatisticInformation.java" />
+        <option value="$PROJECT_DIR$/actual-dependency-analysis-result-consumer/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalysisprocessing/NodeDependencyStatisticInformation.java" />
       </list>
     </option>
   </component>
@@ -99,6 +104,24 @@
   <component name="MavenProjectNavigator">
     <treeState>
       <expand>
+        <path>
+          <item name="" type="16c1761:MavenProjectsStructure$RootNode" />
+          <item name="actual-dependency-analyser" type="9519ce18:MavenProjectsStructure$ProjectNode" />
+        </path>
+        <path>
+          <item name="" type="16c1761:MavenProjectsStructure$RootNode" />
+          <item name="actual-dependency-analyser" type="9519ce18:MavenProjectsStructure$ProjectNode" />
+          <item name="Dependencies" type="f4be9f2a:MavenProjectsStructure$DependenciesNode" />
+        </path>
+        <path>
+          <item name="" type="16c1761:MavenProjectsStructure$RootNode" />
+          <item name="actual-dependency-analysis-result-consumer" type="9519ce18:MavenProjectsStructure$ProjectNode" />
+        </path>
+        <path>
+          <item name="" type="16c1761:MavenProjectsStructure$RootNode" />
+          <item name="actual-dependency-analysis-result-consumer" type="9519ce18:MavenProjectsStructure$ProjectNode" />
+          <item name="Dependencies" type="f4be9f2a:MavenProjectsStructure$DependenciesNode" />
+        </path>
         <path>
           <item name="" type="16c1761:MavenProjectsStructure$RootNode" />
           <item name="wolves-plugin" type="9519ce18:MavenProjectsStructure$ProjectNode" />
@@ -137,6 +160,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
@@ -148,17 +172,25 @@
             <path>
               <item name="ActualDependencyAnalysis" type="b2602c69:ProjectViewProjectNode" />
               <item name="ActualDependencyAnalysis" type="462c0819:PsiDirectoryNode" />
+              <item name="actual-dependency-analyser" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ActualDependencyAnalysis" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ActualDependencyAnalysis" type="462c0819:PsiDirectoryNode" />
+              <item name="actual-dependency-analyser" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="ActualDependencyAnalysis" type="b2602c69:ProjectViewProjectNode" />
               <item name="ActualDependencyAnalysis" type="462c0819:PsiDirectoryNode" />
+              <item name="actual-dependency-analyser" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="main" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="ActualDependencyAnalysis" type="b2602c69:ProjectViewProjectNode" />
               <item name="ActualDependencyAnalysis" type="462c0819:PsiDirectoryNode" />
+              <item name="actual-dependency-analyser" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="main" type="462c0819:PsiDirectoryNode" />
               <item name="java" type="462c0819:PsiDirectoryNode" />
@@ -166,6 +198,7 @@
             <path>
               <item name="ActualDependencyAnalysis" type="b2602c69:ProjectViewProjectNode" />
               <item name="ActualDependencyAnalysis" type="462c0819:PsiDirectoryNode" />
+              <item name="actual-dependency-analyser" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="main" type="462c0819:PsiDirectoryNode" />
               <item name="java" type="462c0819:PsiDirectoryNode" />
@@ -174,6 +207,7 @@
             <path>
               <item name="ActualDependencyAnalysis" type="b2602c69:ProjectViewProjectNode" />
               <item name="ActualDependencyAnalysis" type="462c0819:PsiDirectoryNode" />
+              <item name="actual-dependency-analyser" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="main" type="462c0819:PsiDirectoryNode" />
               <item name="java" type="462c0819:PsiDirectoryNode" />
@@ -183,6 +217,7 @@
             <path>
               <item name="ActualDependencyAnalysis" type="b2602c69:ProjectViewProjectNode" />
               <item name="ActualDependencyAnalysis" type="462c0819:PsiDirectoryNode" />
+              <item name="actual-dependency-analyser" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="main" type="462c0819:PsiDirectoryNode" />
               <item name="java" type="462c0819:PsiDirectoryNode" />
@@ -193,6 +228,7 @@
             <path>
               <item name="ActualDependencyAnalysis" type="b2602c69:ProjectViewProjectNode" />
               <item name="ActualDependencyAnalysis" type="462c0819:PsiDirectoryNode" />
+              <item name="actual-dependency-analyser" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="main" type="462c0819:PsiDirectoryNode" />
               <item name="java" type="462c0819:PsiDirectoryNode" />
@@ -204,6 +240,7 @@
             <path>
               <item name="ActualDependencyAnalysis" type="b2602c69:ProjectViewProjectNode" />
               <item name="ActualDependencyAnalysis" type="462c0819:PsiDirectoryNode" />
+              <item name="actual-dependency-analyser" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="main" type="462c0819:PsiDirectoryNode" />
               <item name="java" type="462c0819:PsiDirectoryNode" />
@@ -216,6 +253,7 @@
             <path>
               <item name="ActualDependencyAnalysis" type="b2602c69:ProjectViewProjectNode" />
               <item name="ActualDependencyAnalysis" type="462c0819:PsiDirectoryNode" />
+              <item name="actual-dependency-analyser" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="main" type="462c0819:PsiDirectoryNode" />
               <item name="java" type="462c0819:PsiDirectoryNode" />
@@ -226,25 +264,219 @@
               <item name="plugins" type="462c0819:PsiDirectoryNode" />
               <item name="actualdependencyanalyser" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="ActualDependencyAnalysis" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ActualDependencyAnalysis" type="462c0819:PsiDirectoryNode" />
+              <item name="actual-dependency-analysis-result-consumer" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ActualDependencyAnalysis" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ActualDependencyAnalysis" type="462c0819:PsiDirectoryNode" />
+              <item name="actual-dependency-analysis-result-consumer" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ActualDependencyAnalysis" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ActualDependencyAnalysis" type="462c0819:PsiDirectoryNode" />
+              <item name="actual-dependency-analysis-result-consumer" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ActualDependencyAnalysis" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ActualDependencyAnalysis" type="462c0819:PsiDirectoryNode" />
+              <item name="actual-dependency-analysis-result-consumer" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ActualDependencyAnalysis" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ActualDependencyAnalysis" type="462c0819:PsiDirectoryNode" />
+              <item name="actual-dependency-analysis-result-consumer" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="de" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ActualDependencyAnalysis" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ActualDependencyAnalysis" type="462c0819:PsiDirectoryNode" />
+              <item name="actual-dependency-analysis-result-consumer" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="de" type="462c0819:PsiDirectoryNode" />
+              <item name="hhn" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ActualDependencyAnalysis" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ActualDependencyAnalysis" type="462c0819:PsiDirectoryNode" />
+              <item name="actual-dependency-analysis-result-consumer" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="de" type="462c0819:PsiDirectoryNode" />
+              <item name="hhn" type="462c0819:PsiDirectoryNode" />
+              <item name="it" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ActualDependencyAnalysis" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ActualDependencyAnalysis" type="462c0819:PsiDirectoryNode" />
+              <item name="actual-dependency-analysis-result-consumer" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="de" type="462c0819:PsiDirectoryNode" />
+              <item name="hhn" type="462c0819:PsiDirectoryNode" />
+              <item name="it" type="462c0819:PsiDirectoryNode" />
+              <item name="wolves" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ActualDependencyAnalysis" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ActualDependencyAnalysis" type="462c0819:PsiDirectoryNode" />
+              <item name="actual-dependency-analysis-result-consumer" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="de" type="462c0819:PsiDirectoryNode" />
+              <item name="hhn" type="462c0819:PsiDirectoryNode" />
+              <item name="it" type="462c0819:PsiDirectoryNode" />
+              <item name="wolves" type="462c0819:PsiDirectoryNode" />
+              <item name="plugins" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ActualDependencyAnalysis" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ActualDependencyAnalysis" type="462c0819:PsiDirectoryNode" />
+              <item name="actual-dependency-analysis-result-consumer" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="de" type="462c0819:PsiDirectoryNode" />
+              <item name="hhn" type="462c0819:PsiDirectoryNode" />
+              <item name="it" type="462c0819:PsiDirectoryNode" />
+              <item name="wolves" type="462c0819:PsiDirectoryNode" />
+              <item name="plugins" type="462c0819:PsiDirectoryNode" />
+              <item name="actualdependencyanalysisprocessing" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ActualDependencyAnalysis" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ActualDependencyAnalysis" type="462c0819:PsiDirectoryNode" />
+              <item name="actual-dependency-analysis-stats-generator" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ActualDependencyAnalysis" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ActualDependencyAnalysis" type="462c0819:PsiDirectoryNode" />
+              <item name="actual-dependency-analysis-stats-generator" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ActualDependencyAnalysis" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ActualDependencyAnalysis" type="462c0819:PsiDirectoryNode" />
+              <item name="actual-dependency-analysis-stats-generator" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ActualDependencyAnalysis" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ActualDependencyAnalysis" type="462c0819:PsiDirectoryNode" />
+              <item name="actual-dependency-analysis-stats-generator" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ActualDependencyAnalysis" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ActualDependencyAnalysis" type="462c0819:PsiDirectoryNode" />
+              <item name="actual-dependency-analysis-stats-generator" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="de" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ActualDependencyAnalysis" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ActualDependencyAnalysis" type="462c0819:PsiDirectoryNode" />
+              <item name="actual-dependency-analysis-stats-generator" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="de" type="462c0819:PsiDirectoryNode" />
+              <item name="hhn" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ActualDependencyAnalysis" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ActualDependencyAnalysis" type="462c0819:PsiDirectoryNode" />
+              <item name="actual-dependency-analysis-stats-generator" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="de" type="462c0819:PsiDirectoryNode" />
+              <item name="hhn" type="462c0819:PsiDirectoryNode" />
+              <item name="it" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ActualDependencyAnalysis" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ActualDependencyAnalysis" type="462c0819:PsiDirectoryNode" />
+              <item name="actual-dependency-analysis-stats-generator" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="de" type="462c0819:PsiDirectoryNode" />
+              <item name="hhn" type="462c0819:PsiDirectoryNode" />
+              <item name="it" type="462c0819:PsiDirectoryNode" />
+              <item name="wolves" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ActualDependencyAnalysis" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ActualDependencyAnalysis" type="462c0819:PsiDirectoryNode" />
+              <item name="actual-dependency-analysis-stats-generator" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="de" type="462c0819:PsiDirectoryNode" />
+              <item name="hhn" type="462c0819:PsiDirectoryNode" />
+              <item name="it" type="462c0819:PsiDirectoryNode" />
+              <item name="wolves" type="462c0819:PsiDirectoryNode" />
+              <item name="plugins" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ActualDependencyAnalysis" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ActualDependencyAnalysis" type="462c0819:PsiDirectoryNode" />
+              <item name="actual-dependency-analysis-stats-generator" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="de" type="462c0819:PsiDirectoryNode" />
+              <item name="hhn" type="462c0819:PsiDirectoryNode" />
+              <item name="it" type="462c0819:PsiDirectoryNode" />
+              <item name="wolves" type="462c0819:PsiDirectoryNode" />
+              <item name="plugins" type="462c0819:PsiDirectoryNode" />
+              <item name="actualdependencyanalysisstatsgeneration" type="462c0819:PsiDirectoryNode" />
+            </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../pencilblue" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="npm" />
-    <property name="project.structure.last.edited" value="Project" />
+    <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="settings.editor.selected.configurable" value="settings.nodejs" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Marvin\IdeaProjects\ActualDependencyAnalysis\actual-dependency-analyser" />
+    </key>
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -310,18 +542,24 @@
       <workItem from="1561155548024" duration="601000" />
       <workItem from="1561156590853" duration="1186000" />
       <workItem from="1561158188573" duration="382000" />
-      <workItem from="1561158780489" duration="208000" />
+      <workItem from="1561158780489" duration="391000" />
+      <workItem from="1561203922200" duration="495000" />
+      <workItem from="1561205693007" duration="1576000" />
+      <workItem from="1561466437696" duration="690000" />
+      <workItem from="1561906521079" duration="3214000" />
+      <workItem from="1562068990663" duration="5392000" />
+      <workItem from="1562165169355" duration="906000" />
+      <workItem from="1562242430833" duration="10655000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="39725000" />
+    <option name="totallyTimeSpent" value="62836000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.2803838" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.20682302" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -341,12 +579,13 @@
       <window_info anchor="bottom" id="Terminal" order="10" />
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
       <window_info anchor="bottom" id="Java Enterprise" order="12" />
+      <window_info anchor="bottom" id="Messages" order="13" visible="true" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="Palette" order="3" />
       <window_info anchor="right" id="Theme Preview" order="4" />
-      <window_info anchor="right" id="Maven" order="5" visible="true" weight="0.11353944" />
+      <window_info anchor="right" id="Maven" order="5" visible="true" weight="0.2153518" />
       <window_info anchor="right" id="Capture Analysis" order="6" />
       <window_info anchor="right" id="Palette&#9;" order="7" />
       <window_info anchor="right" id="Database" order="8" />
@@ -400,41 +639,101 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/ActualDependencyAnalysis.iml">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/actual-dependency-analyser/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="10" selection-start-line="10" selection-end-line="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/actual-dependency-analysis-result-consumer/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="13" column="18" selection-start-line="13" selection-start-column="18" selection-end-line="13" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/pom.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="697">
-          <caret line="41" column="32" selection-start-line="41" selection-start-column="32" selection-end-line="41" selection-end-column="32" />
+        <state relative-caret-position="238">
+          <caret line="14" lean-forward="true" selection-start-line="14" selection-end-line="14" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/NodeDependencyAnalysisResult.java">
+    <entry file="file://$PROJECT_DIR$/actual-dependency-analyser/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/NodeDependencyAnalysisResult.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="12" selection-start-line="12" selection-end-line="12" />
+        <state relative-caret-position="306">
+          <caret line="18" column="27" selection-start-line="18" selection-start-column="27" selection-end-line="18" selection-end-column="27" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/MavenDependencyAnalysisResult.java">
+    <entry file="file://$PROJECT_DIR$/actual-dependency-analyser/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/MavenDependencyAnalysisResult.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="8" selection-start-line="8" selection-end-line="21" selection-end-column="1" />
+        <state relative-caret-position="238">
+          <caret line="14" column="57" lean-forward="true" selection-start-line="14" selection-start-column="57" selection-end-line="14" selection-end-column="57" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/ActualDependencyAnalyserPlugin.java">
+    <entry file="file://$PROJECT_DIR$/actual-dependency-analysis-result-consumer/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalysisprocessing/ActualDependencyAnalysisResultConsumer.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="374">
-          <caret line="116" column="46" selection-start-line="116" selection-start-column="46" selection-end-line="116" selection-end-column="46" />
+          <caret line="22" column="140" selection-start-line="22" selection-start-column="140" selection-end-line="22" selection-end-column="140" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#8110#8111#0" expanded="true" />
-            <element signature="e#8144#8145#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/actual-dependency-analysis-result-consumer/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalysisprocessing/MavenDependencyStatisticInformation.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="289">
+          <caret line="17" lean-forward="true" selection-start-line="17" selection-end-line="17" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/actual-dependency-analysis-result-consumer/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalysisprocessing/NodeDependencyStatisticInformation.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="306">
+          <caret line="20" lean-forward="true" selection-start-line="20" selection-end-line="20" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/actual-dependency-analyser/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/ActualDependencyAnalyserPlugin.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="721">
+          <caret line="157" column="5" lean-forward="true" selection-start-line="157" selection-start-column="5" selection-end-line="157" selection-end-column="5" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/actual-dependency-analysis-stats-generator/pom.xml">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/actual-dependency-analysis-stats-generator/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalysisstatsgeneration/ActualDependencyAnalysisStatsGenerator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="323">
+          <caret line="34" selection-start-line="34" selection-end-line="34" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#3458#3459#0" expanded="true" />
+            <element signature="e#3492#3493#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -490,11 +789,12 @@
       </state>
       <state key="ModuleStructureConfigurable.UI">
         <settings>
-          <last-edited>ActualDependencyAnalysis</last-edited>
+          <last-edited>actual-dependency-analysis-stats-generator</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
                 <option value="0.2" />
+                <option value="0.6" />
               </list>
             </option>
           </splitter-proportions>

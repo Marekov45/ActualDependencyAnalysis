@@ -6,7 +6,9 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="ActualDependencyAnalysis" />
+        <module name="actual-dependency-analysis-stats-generator" />
+        <module name="actual-dependency-analyser" />
+        <module name="actual-dependency-analysis-result-consumer" />
       </profile>
     </annotationProcessing>
   </component>

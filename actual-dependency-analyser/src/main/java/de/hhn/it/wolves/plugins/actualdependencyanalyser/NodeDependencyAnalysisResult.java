@@ -8,15 +8,15 @@ import java.util.List;
 
 public class NodeDependencyAnalysisResult extends AnalysisResult {
 
-    private final List<String> unusedNodeDependencies;
+    private final List<String> NodeDependencies;
 
 
-    public NodeDependencyAnalysisResult(RepositoryInformation repositoryInformation, String analysisPluginname, List<String> unusedNodeDependencies) {
+    public NodeDependencyAnalysisResult(RepositoryInformation repositoryInformation, String analysisPluginname, List<String> NodeDependencies) {
         super(repositoryInformation, analysisPluginname);
-        this.unusedNodeDependencies = unusedNodeDependencies;
+        this.NodeDependencies = NodeDependencies;
     }
 
-    public List<String> getUnusedNodeDependencies() {
-        return unusedNodeDependencies;
+    public List<String> getNodeDependencies() {
+        return NodeDependencies;
     }
 }
