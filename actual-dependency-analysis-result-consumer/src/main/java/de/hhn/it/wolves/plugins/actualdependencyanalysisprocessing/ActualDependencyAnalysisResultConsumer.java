@@ -17,10 +17,10 @@ public class ActualDependencyAnalysisResultConsumer implements AnalysisResultCon
     public StatisticInformation processAnalysisResults(AnalysisResult analysisResult) {
         if ((analysisResult instanceof MavenDependencyAnalysisResult)) {
             logger.info("I got a Maven dependency analysis result. We will forward it to the correspondent statistic generator plugin!");
-            return new MavenDependencyStatisticInformation(analysisResult, getUniqueName(),((MavenDependencyAnalysisResult) analysisResult).getMavenDependencies());
+            return new MavenDependencyStatisticInformation(analysisResult, getUniqueName(),((MavenDependencyAnalysisResult) analysisResult).getAllMavenDependencies(),((MavenDependencyAnalysisResult) analysisResult).getUnusedMavenDependencies());
         } else if ((analysisResult instanceof NodeDependencyAnalysisResult)) {
             logger.info("I got a Nodejs dependency analysis result. We will forward it to the correspondent statistic generator plugin!");
-            return new NodeDependencyStatisticInformation(analysisResult,getUniqueName(),((NodeDependencyAnalysisResult) analysisResult).getNodeDependencies());
+            return new NodeDependencyStatisticInformation(analysisResult,getUniqueName(),((NodeDependencyAnalysisResult) analysisResult).getAllNodeDependencies(), ((NodeDependencyAnalysisResult) analysisResult).getUnusedNodeDependencies());
         } else {
             logger.error("I got an analysis result that I am not designed for!");
             return new StatisticInformationWithoutProcessing(analysisResult, getUniqueName());

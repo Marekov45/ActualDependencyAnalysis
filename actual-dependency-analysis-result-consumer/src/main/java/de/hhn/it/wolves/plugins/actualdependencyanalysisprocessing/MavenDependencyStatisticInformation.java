@@ -14,14 +14,19 @@ public class MavenDependencyStatisticInformation extends StatisticInformation {
 //es muss geschaut werden ob die ungenutzte Abhängigkeit auch tatsächlich eine Schwachstelle ist
 // --> filtern der unused dependencies über vergleich mit schwachstellendatenbank?
 
-    private final List<Artifact> forwardedMavenDependencies ;
+    private final List<Artifact> allForwardedMavenDependencies ;
+    private final List<Artifact> unusedForwardedMavenDependencies ;
 
-    public MavenDependencyStatisticInformation(AnalysisResult analysisResult, String processedPluginName, List<Artifact> forwardedMavenDependencies) {
+    public MavenDependencyStatisticInformation(AnalysisResult analysisResult, String processedPluginName, List<Artifact> allForwardedMavenDependencies,List<Artifact> unusedForwardedMavenDependencies) {
         super(analysisResult, processedPluginName);
-        this.forwardedMavenDependencies = forwardedMavenDependencies;
+        this.allForwardedMavenDependencies = allForwardedMavenDependencies;
+        this.unusedForwardedMavenDependencies = unusedForwardedMavenDependencies;
     }
-    public List<Artifact> getForwardedMavenDependencies() {
-        return forwardedMavenDependencies;
+    public List<Artifact> getAllForwardedMavenDependencies() {
+        return allForwardedMavenDependencies;
     }
 
+    public List<Artifact> getUnusedForwardedMavenDependencies() {
+        return unusedForwardedMavenDependencies;
+    }
 }

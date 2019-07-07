@@ -8,6 +8,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="actual-dependency-analysis-stats-generator" />
         <module name="actual-dependency-analyser" />
+        <module name="global-actual-dependency-analysis-stats-generator" />
         <module name="actual-dependency-analysis-result-consumer" />
       </profile>
     </annotationProcessing>

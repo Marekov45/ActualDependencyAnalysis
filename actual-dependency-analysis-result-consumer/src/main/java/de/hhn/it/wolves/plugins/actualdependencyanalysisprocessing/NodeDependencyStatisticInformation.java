@@ -7,14 +7,20 @@ import java.util.List;
 
 public class NodeDependencyStatisticInformation extends StatisticInformation {
 
-    private final List<String> forwardedNodeDependencies;
+    private final List<String> allForwardedNodeDependencies;
+    private final List<String> unusedForwardedNodeDependencies;
 
-    public NodeDependencyStatisticInformation(AnalysisResult analysisResult, String processedPluginName, List<String> forwardedNodeDependencies) {
+    public NodeDependencyStatisticInformation(AnalysisResult analysisResult, String processedPluginName, List<String> allForwardedNodeDependencies, List<String> unusedForwardedNodeDependencies) {
         super(analysisResult, processedPluginName);
-        this.forwardedNodeDependencies = forwardedNodeDependencies;
+        this.allForwardedNodeDependencies = allForwardedNodeDependencies;
+        this.unusedForwardedNodeDependencies = unusedForwardedNodeDependencies;
     }
 
-    public List<String> getForwardedNodeDependencies() {
-        return forwardedNodeDependencies;
+    public List<String> getAllForwardedNodeDependencies() {
+        return allForwardedNodeDependencies;
+    }
+
+    public List<String> getUnusedForwardedNodeDependencies() {
+        return unusedForwardedNodeDependencies;
     }
 }

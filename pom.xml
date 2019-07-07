@@ -12,6 +12,7 @@
         <module>actual-dependency-analyser</module>
         <module>actual-dependency-analysis-result-consumer</module>
         <module>actual-dependency-analysis-stats-generator</module>
+        <module>global-actual-dependency-analysis-stats-generator</module>
     </modules>
 
     <dependencies>

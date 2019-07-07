@@ -11,10 +11,10 @@ import org.apache.maven.artifact.Artifact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 public class ActualDependencyAnalysisStatsGenerator implements StatisticGeneratorPlugin {
@@ -29,12 +29,72 @@ public class ActualDependencyAnalysisStatsGenerator implements StatisticGenerato
 
     @Override
     public GeneratedStatisticInformation generateStatistic(File file, String s, StatisticInformation statisticInformation) {
+        String seperator = ";";
+        List<String> lines = new ArrayList<>();
+        lines.add("Dependency;Version;Unused");
+        boolean foundUnused = false;
         if ((statisticInformation instanceof MavenDependencyStatisticInformation)) {
-            //  for (Artifact artifact : ((MavenDependencyStatisticInformation) statisticInformation).getForwardedMavenDependencies()) {
-            //     }
 
+            for (Artifact artifact : ((MavenDependencyStatisticInformation) statisticInformation).getAllForwardedMavenDependencies()) {
+                StringBuilder sb = new StringBuilder(artifact.getArtifactId());
+                sb.append(seperator).append(artifact.getVersion());
+                // check if the repo has any unused dependencies
+                if (!((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().isEmpty()) {
+                    for (Artifact artifact2 : ((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies()) {
+                        if (artifact2.equals(artifact)) {
+                            sb.append(seperator).append("X");
+                        }
+                    }
+                    foundUnused = true;
+                }
+                lines.add(sb.toString());
+            }
+        } else if ((statisticInformation instanceof NodeDependencyStatisticInformation)) {
+            for (String str : ((NodeDependencyStatisticInformation) statisticInformation).getAllForwardedNodeDependencies()) {
+                String allSplitValues[] = str.split("@");
+                String dependency = allSplitValues[0];
+                String version = allSplitValues[1];
+                StringBuilder sb = new StringBuilder(dependency);
+                sb.append(seperator).append(version);
+                if (!((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies().isEmpty()) {
+                    for (String str2 : ((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies()) {
+                        String unusedSplitValues[] = str2.split("\\s");
+                        if (unusedSplitValues[1].equals(dependency)) {
+                            sb.append(seperator).append("X");
+                        }
+                    }
+                    foundUnused = true;
+                }
+                lines.add(sb.toString());
+
+            }
+        } else {
+            logger.error("I got an statistic information that I am not designed for!");
+            return new GeneratedStatisticInformation(statisticInformation, null, getUniqueName());
         }
-        return null;
+        BufferedWriter writer = null;
+        try {
+            writer = new BufferedWriter(new FileWriter(file.getAbsolutePath() + "/" + s + ".csv"));
+            if (foundUnused) {
+                writer = new BufferedWriter(new FileWriter(file.getAbsolutePath() + "/[UNUSED] " + s + ".csv"));
+            }
+            for (String string : lines) {
+                writer.write(string);
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            logger.error("We could not write the report for this specific repository!", e);
+        } finally {
+            if (writer != null)
+                try {
+                    writer.close();
+                } catch (IOException e) {
+                    logger.error("We could not close the buffered writer. Maybe data will be lost or not generated!");
+                }
+        }
+
+
+        return new GeneratedStatisticInformation(statisticInformation, file, getUniqueName());
     }
 
     @Override
@@ -81,4 +141,6 @@ public class ActualDependencyAnalysisStatsGenerator implements StatisticGenerato
     public void cleanUp() {
 
     }
+
+
 }

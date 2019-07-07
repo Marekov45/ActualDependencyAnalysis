@@ -8,15 +8,22 @@ import java.util.List;
 
 public class MavenDependencyAnalysisResult extends AnalysisResult {
 
-    private final List<Artifact> MavenDependencies;
+    private final List<Artifact> allMavenDependencies;
+    private final List<Artifact> unusedMavenDependencies;
 
 
-    public MavenDependencyAnalysisResult(RepositoryInformation repositoryInformation, String analysisPluginname, List<Artifact> MavenDependencies) {
+    public MavenDependencyAnalysisResult(RepositoryInformation repositoryInformation, String analysisPluginname, List<Artifact> allMavenDependencies, List<Artifact> unusedMavenDependencies) {
         super(repositoryInformation, analysisPluginname);
-        this.MavenDependencies = MavenDependencies;
+        this.allMavenDependencies = allMavenDependencies;
+        this.unusedMavenDependencies = unusedMavenDependencies;
     }
 
-    public List<Artifact> getMavenDependencies() {
-        return MavenDependencies;
+    public List<Artifact> getAllMavenDependencies() {
+        return allMavenDependencies;
+    }
+
+
+    public List<Artifact> getUnusedMavenDependencies() {
+        return unusedMavenDependencies;
     }
 }

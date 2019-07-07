@@ -74,8 +74,8 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
 
                 Invoker invoker = new DefaultInvoker();
 
-                ArrayList<String> mavenPluginOutput = new ArrayList<>();
-                List<Artifact> artifacts = new ArrayList<>();
+                ArrayList<String> allMavenDependencies = new ArrayList<>();
+                List<Artifact> allArtifacts = new ArrayList<>();
                 try {
 
                     invoker.setOutputHandler(new InvocationOutputHandler() {
@@ -83,7 +83,7 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                         public void consumeLine(String line) throws IOException {
                             //       if (line.startsWith("[WARNING] Unused declared") || line.startsWith("[WARNING]    ")) {
                             if (line.startsWith("[INFO]    ")) {
-                                mavenPluginOutput.add(line);
+                                allMavenDependencies.add(line);
                             }
                         }
                     });
@@ -98,10 +98,37 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                 //   return new AnalysisResultWithoutProcessing(repositoryInformation, getUniqueName());
                 //   }
                 //   for (int i = getUnusedDependencyIndex(mavenPluginOutput, mavenText) + 1; i < mavenPluginOutput.size(); i++) {
-                for (int i = 0; i < mavenPluginOutput.size(); i++) {
-                    artifacts.add(buildArtifactFromString(mavenPluginOutput, i));
+                for (int i = 0; i < allMavenDependencies.size(); i++) {
+                    allArtifacts.add(buildArtifactFromString(allMavenDependencies, i));
                 }
-                return new MavenDependencyAnalysisResult(repositoryInformation, getUniqueName(), artifacts);
+
+                ArrayList<String> unusedMavenDependencies = new ArrayList<>();
+                List<Artifact> unusedArtifacts = new ArrayList<>();
+                try {
+
+                    invoker.setOutputHandler(new InvocationOutputHandler() {
+                        @Override
+                        public void consumeLine(String line) throws IOException {
+                            if (line.startsWith("[WARNING] Unused declared") || line.startsWith("[WARNING]    ")) {
+
+                                unusedMavenDependencies.add(line);
+                            }
+                        }
+                    });
+                    invoker.execute(request);
+                } catch (MavenInvocationException e) {
+                    e.printStackTrace();
+                }
+
+                String mavenText = "[WARNING] Unused declared dependencies found:";
+
+                // check if repo has unused dependencies
+                if (unusedMavenDependencies.contains(mavenText)) {
+                    for (int i = getUnusedDependencyIndex(unusedMavenDependencies, mavenText) + 1; i < unusedMavenDependencies.size(); i++) {
+                        unusedArtifacts.add(buildArtifactFromString(unusedMavenDependencies, i));
+                    }
+                }
+                return new MavenDependencyAnalysisResult(repositoryInformation, getUniqueName(), allArtifacts, unusedArtifacts);
 
             case JAVA_SCRIPT:
                 File packageJSONFile = new File(repositoryInformation.getLocalDownloadPath() + JSON_FILE);
@@ -120,7 +147,7 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                     e.printStackTrace();
                 }
                 BufferedReader input = new BufferedReader((new InputStreamReader(p.getInputStream())));
-                ArrayList<String> allDependencies = new ArrayList<>();
+                ArrayList<String> allNodeDependencies = new ArrayList<>();
                 String line = null;
                 while (true) {
                     try {
@@ -129,28 +156,53 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                         if (line == null) {
                             break;
                         } else if (line.contains("--")) {
-                            allDependencies.add(line);
+                            allNodeDependencies.add(line);
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
 
-                    //   allDependencies.add(line);
-
                 }
                 ArrayList<String> nodeDependencies = new ArrayList<>();
-                for (int i = 0; i < allDependencies.size(); i++) {
-                    nodeDependencies.add(getNameOfDependency(allDependencies, i));
+                for (int i = 0; i < allNodeDependencies.size(); i++) {
+                    nodeDependencies.add(getNameOfDependency(allNodeDependencies, i));
                 }
+                //the command for getting all unused dependencies
+                pb.command("cmd", "/c", "depcheck");
+                Process p2 = null;
+                try {
+                    p2 = pb.start();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                BufferedReader reader = new BufferedReader(new InputStreamReader(p2.getInputStream()));
 
-                //  String depcheckText = "Missing dependencies";
-                //  for (int i = 0; i < getUnusedDependencyIndex(allDependencies, depcheckText); i++) {
-                //      unusedDependencies.add(allDependencies.get(i));
-                //   }
+                String row = null;
+                ArrayList<String> depcheckDependencies = new ArrayList<>();
+                while (true) {
+                    try {
+                        if (!((row = reader.readLine()) != null)) break;
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    depcheckDependencies.add(row);
+                }
+                ArrayList<String> unusedNodeDependencies = new ArrayList<>();
+                String depcheckText = "Missing dependencies";
+                if (depcheckDependencies.contains(depcheckText)) {
+                    for (int i = 0; i < getUnusedDependencyIndex(depcheckDependencies, depcheckText); i++) {
+                        unusedNodeDependencies.add(depcheckDependencies.get(i));
+                    }
+                } else {
+                    for (int j = 0; j <= depcheckDependencies.size(); j++) {
+                        unusedNodeDependencies.add(depcheckDependencies.get(j));
+                    }
+                }
+                //if it doesnt contain the element it remains unchanged
+                unusedNodeDependencies.remove("Unused dependencies");
+                unusedNodeDependencies.remove("Unused devDependencies");
 
-                //  unusedDependencies.remove("Unused dependencies");
-                //  unusedDependencies.remove("Unused devDependencies");
-                return new NodeDependencyAnalysisResult(repositoryInformation, getUniqueName(), nodeDependencies);
+                return new NodeDependencyAnalysisResult(repositoryInformation, getUniqueName(), nodeDependencies, unusedNodeDependencies);
         }
 
         logger.error("This part should never been reached");
