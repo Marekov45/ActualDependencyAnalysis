@@ -74,6 +74,7 @@ public class ActualDependencyAnalysisStatsGenerator implements StatisticGenerato
         }
         BufferedWriter writer = null;
         try {
+            //unterscheidung maven und nodejs
             writer = new BufferedWriter(new FileWriter(file.getAbsolutePath() + "/" + s + ".csv"));
             if (foundUnused) {
                 writer = new BufferedWriter(new FileWriter(file.getAbsolutePath() + "/[UNUSED] " + s + ".csv"));
@@ -104,32 +105,7 @@ public class ActualDependencyAnalysisStatsGenerator implements StatisticGenerato
 
     @Override
     public void init(FrameworkManager frameworkManager) {
-        this.frameworkManager = frameworkManager;
 
-        synchronized (frameworkManager) {
-            workingDirectory = new File(frameworkManager.getWorkingFolderForPlugins().getAbsolutePath() + "/" + PLUGIN_NAME + "/");
-            logger.info("Checking the properties...");
-            File configFile = new File(workingDirectory.getAbsolutePath() + CONFIG_FILE_NAME);
-            if (!workingDirectory.exists() && !workingDirectory.mkdirs()) {
-                logger.error("We could not create the working directory for " + getUniqueName() + "! Aborting initialisation. Please note: The plugin will not work correctly!");
-            }
-            if (!configFile.exists()) {
-                logger.info("We could not find a properties file for the actual dependency checker! We are generating the default one.");
-                try {
-                    URL url = getClass().getResource("/actualdependency.properties");
-                    FileUtils.copyURLToFile(url, configFile);
-                } catch (IOException e) {
-                    logger.error("Unexpected Error occurred", e);
-                    System.exit(999);
-                }
-            }
-            properties = new Properties();
-            try {
-                properties.load(new FileInputStream(configFile));
-            } catch (IOException e) {
-                logger.error("Could not read the config file!");
-            }
-        }
     }
 
     @Override
