@@ -38,11 +38,13 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
             case JAVA:
 
                 InvocationRequest request = new DefaultInvocationRequest();
+
                 File pomFile = new File(repositoryInformation.getLocalDownloadPath() + POM_FILE);
                 if (!pomFile.exists()) {
-                    logger.info("We could not a find a pom file for this project, thus it will be excluded from the analysis.");
+                    logger.info("We could not a find a pom file for" + repositoryInformation.getName() + ", thus it will be excluded from the analysis.");
                     return new AnalysisResultWithoutProcessing(repositoryInformation, getUniqueName());
                 }
+                logger.info("Starting Maven process for " + pomFile.getAbsolutePath());
                 request.setPomFile(pomFile);
                 //  request.setGoals(Collections.singletonList("dependency:analyze"));
                 request.setGoals(Collections.singletonList("dependency:list"));
@@ -57,6 +59,7 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                         @Override
                         public void consumeLine(String line) throws IOException {
                             //       if (line.startsWith("[WARNING] Unused declared") || line.startsWith("[WARNING]    ")) {
+                          logger.info(line);
                             if (line.startsWith("[INFO]    ")) {
                                 allMavenDependencies.add(line);
                             }
