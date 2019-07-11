@@ -38,6 +38,7 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
             case JAVA:
 
                 InvocationRequest request = new DefaultInvocationRequest();
+                request.setBatchMode(true);
 
                 File pomFile = new File(repositoryInformation.getLocalDownloadPath() + POM_FILE);
                 if (!pomFile.exists()) {
@@ -111,11 +112,11 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
             case JAVA_SCRIPT:
                 File packageJSONFile = new File(repositoryInformation.getLocalDownloadPath() + JSON_FILE);
                 if (!packageJSONFile.exists()) {
-                    logger.info("We could not a find a package.json file for this project, thus it will be excluded from the analysis.");
+                    logger.info("We could not a find a package.json file for "+ repositoryInformation.getName() +", thus it will be excluded from the analysis.");
                     return new AnalysisResultWithoutProcessing(repositoryInformation, getUniqueName());
                 }
                 // ProcessBuilder pb = new ProcessBuilder("cmd", "/c", "depcheck");
-                ProcessBuilder pb = new ProcessBuilder("cmd", "/c", "npm list --depth 0");
+                ProcessBuilder pb = new ProcessBuilder("npm" ,"list" ,"--depth 0");
                 pb.directory(repositoryInformation.getLocalDownloadPath());
                 pb.redirectErrorStream(true);
                 Process p = null;
@@ -129,12 +130,17 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                 String line = null;
                 while (true) {
                     try {
+
                         //if (!((line = input.readLine()) != null)) break;
                         line = input.readLine();
+                        logger.info("npm run information:" + line);
+
                         if (line == null) {
                             break;
+
                         } else if (line.contains("--")) {
                             allNodeDependencies.add(line);
+
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -146,7 +152,7 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                     nodeDependencies.add(getNameOfDependency(allNodeDependencies, i));
                 }
                 //the command for getting all unused dependencies
-                pb.command("cmd", "/c", "depcheck");
+                pb.command("depcheck");
                 Process p2 = null;
                 try {
                     p2 = pb.start();
@@ -159,7 +165,9 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                 ArrayList<String> depcheckDependencies = new ArrayList<>();
                 while (true) {
                     try {
+
                         if (!((row = reader.readLine()) != null)) break;
+                        logger.info(line);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -172,7 +180,7 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                         unusedNodeDependencies.add(depcheckDependencies.get(i));
                     }
                 } else {
-                    for (int j = 0; j <= depcheckDependencies.size(); j++) {
+                    for (int j = 0; j < depcheckDependencies.size(); j++) {
                         unusedNodeDependencies.add(depcheckDependencies.get(j));
                     }
                 }

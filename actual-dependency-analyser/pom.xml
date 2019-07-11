@@ -42,6 +42,9 @@
                                         <exclude>META-INF/*.SF</exclude>
                                         <exclude>META-INF/*.DSA</exclude>
                                         <exclude>META-INF/*.RSA</exclude>
+                                        <exclude>META-INF/services/de.hhn.it.wolves.components.CrawlerPlugin</exclude>
+                                        <exclude>META-INF/services/de.hhn.it.wolves.components.AnalysisResultConsumerPlugin</exclude>
+                                        <exclude>META-INF/services/de.hhn.it.wolves.components.StatisticGeneratorPlugin</exclude>
                                     </excludes>
                                 </filter>
                             </filters>

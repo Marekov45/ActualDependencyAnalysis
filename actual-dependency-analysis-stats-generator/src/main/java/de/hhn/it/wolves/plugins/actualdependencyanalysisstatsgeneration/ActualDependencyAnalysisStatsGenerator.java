@@ -52,6 +52,7 @@ public class ActualDependencyAnalysisStatsGenerator implements StatisticGenerato
         } else if ((statisticInformation instanceof NodeDependencyStatisticInformation)) {
             for (String str : ((NodeDependencyStatisticInformation) statisticInformation).getAllForwardedNodeDependencies()) {
                 String allSplitValues[] = str.split("@");
+                logger.info("Following line incoming "+ str);
                 String dependency = allSplitValues[0];
                 String version = allSplitValues[1];
                 StringBuilder sb = new StringBuilder(dependency);
