@@ -52,17 +52,30 @@ public class ActualDependencyAnalysisStatsGenerator implements StatisticGenerato
         } else if ((statisticInformation instanceof NodeDependencyStatisticInformation)) {
             for (String str : ((NodeDependencyStatisticInformation) statisticInformation).getAllForwardedNodeDependencies()) {
                 String allSplitValues[] = str.split("@");
-                logger.info("Following line incoming "+ str);
+                logger.info("Following line incoming " + str);
                 String dependency = allSplitValues[0];
                 String version = allSplitValues[1];
-                StringBuilder sb = new StringBuilder(dependency);
+                StringBuilder sb = new StringBuilder();
+                sb.append(dependency);
                 sb.append(seperator).append(version);
-                if (!((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies().isEmpty()) {
+                //die if Anweisung funktioniert nicht, da alle Projekte falsch im Ordner hinterlegt werden, einmal als projektname.csv und dann noch als [UNUSED] projektname.csv
+                if (((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies().isEmpty() == false) {
                     for (String str2 : ((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies()) {
-                        String unusedSplitValues[] = str2.split("\\s");
-                        if (unusedSplitValues[1].equals(dependency)) {
-                            sb.append(seperator).append("X");
+                        if (!str2.contains("*")) {
+                            logger.info("Angeblich unused : " + str2);
+                            if (str2.equals(dependency)) {
+                                logger.info("Übereinstimmung!");
+                                sb.append(seperator).append("X");
+                            }
+                        } else {
+                            logger.info("Angeblich unused : " + str2);
+                            String unusedSplitValues[] = str2.split("\\s");
+                            if (unusedSplitValues[1].equals(dependency)) {
+                                logger.info("Übereinstimmung!");
+                                sb.append(seperator).append("X");
+                            }
                         }
+
                     }
                     foundUnused = true;
                 }
@@ -76,9 +89,11 @@ public class ActualDependencyAnalysisStatsGenerator implements StatisticGenerato
         BufferedWriter writer = null;
         try {
             //unterscheidung maven und nodejs
-            writer = new BufferedWriter(new FileWriter(file.getAbsolutePath() + "/" + s + ".csv"));
+
             if (foundUnused) {
                 writer = new BufferedWriter(new FileWriter(file.getAbsolutePath() + "/[UNUSED] " + s + ".csv"));
+            } else {
+                writer = new BufferedWriter(new FileWriter(file.getAbsolutePath() + "/" + s + ".csv"));
             }
             for (String string : lines) {
                 writer.write(string);

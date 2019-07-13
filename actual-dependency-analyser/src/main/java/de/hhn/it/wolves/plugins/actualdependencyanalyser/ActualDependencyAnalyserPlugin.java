@@ -51,7 +51,7 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                 request.setGoals(Collections.singletonList("dependency:list"));
 
                 Invoker invoker = new DefaultInvoker();
-
+                invoker.setMavenHome(new File("/usr/share/maven"));
                 ArrayList<String> allMavenDependencies = new ArrayList<>();
                 List<Artifact> allArtifacts = new ArrayList<>();
                 try {
@@ -60,7 +60,7 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                         @Override
                         public void consumeLine(String line) throws IOException {
                             //       if (line.startsWith("[WARNING] Unused declared") || line.startsWith("[WARNING]    ")) {
-                          logger.info(line);
+                            logger.info(line);
                             if (line.startsWith("[INFO]    ")) {
                                 allMavenDependencies.add(line);
                             }
@@ -112,35 +112,54 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
             case JAVA_SCRIPT:
                 File packageJSONFile = new File(repositoryInformation.getLocalDownloadPath() + JSON_FILE);
                 if (!packageJSONFile.exists()) {
-                    logger.info("We could not a find a package.json file for "+ repositoryInformation.getName() +", thus it will be excluded from the analysis.");
+                    logger.info("We could not a find a package.json file for " + repositoryInformation.getName() + ", thus it will be excluded from the analysis.");
                     return new AnalysisResultWithoutProcessing(repositoryInformation, getUniqueName());
                 }
-                // ProcessBuilder pb = new ProcessBuilder("cmd", "/c", "depcheck");
-                ProcessBuilder pb = new ProcessBuilder("npm" ,"list" ,"--depth 0");
+
+                // ProcessBuilder pb = new ProcessBuilder("npm","list","-depth 0");
+                ProcessBuilder pb = new ProcessBuilder("/bin/bash", "-c", "npm install");
                 pb.directory(repositoryInformation.getLocalDownloadPath());
                 pb.redirectErrorStream(true);
                 Process p = null;
                 try {
                     p = pb.start();
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                BufferedReader input = new BufferedReader((new InputStreamReader(p.getInputStream())));
+                try {
+                    p.waitFor();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                pb.command("/bin/bash", "-c", "npm list -depth 0");
+                Process p3 = null;
+                try {
+                    p3 = pb.start();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                BufferedReader input = new BufferedReader((new InputStreamReader(p3.getInputStream())));
                 ArrayList<String> allNodeDependencies = new ArrayList<>();
                 String line = null;
+                try {
+                    input.readLine();  // read first line so analysis starts at line 2
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 while (true) {
                     try {
 
                         //if (!((line = input.readLine()) != null)) break;
                         line = input.readLine();
-                        logger.info("npm run information:" + line);
+                        //logger.info("npm run information:" + line);
 
                         if (line == null) {
                             break;
-
-                        } else if (line.contains("--")) {
+// Programm erreicht nie die else if Bedingung??? Darstellung dependency structure windows: +--
+                        } else if (line.contains("@") && !line.contains("UNMET") && line.charAt(1) == '─') {
                             allNodeDependencies.add(line);
-
+                            logger.info("Inhalt Liste aller Dependencies: " + allNodeDependencies.toString());
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -150,6 +169,11 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                 ArrayList<String> nodeDependencies = new ArrayList<>();
                 for (int i = 0; i < allNodeDependencies.size(); i++) {
                     nodeDependencies.add(getNameOfDependency(allNodeDependencies, i));
+                    if (nodeDependencies.get(i).startsWith("@")) {
+                        String s = nodeDependencies.get(i).substring(1);
+                        nodeDependencies.remove(i);
+                        nodeDependencies.add(s);
+                    }
                 }
                 //the command for getting all unused dependencies
                 pb.command("depcheck");
@@ -178,16 +202,35 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                 if (depcheckDependencies.contains(depcheckText)) {
                     for (int i = 0; i < getUnusedDependencyIndex(depcheckDependencies, depcheckText); i++) {
                         unusedNodeDependencies.add(depcheckDependencies.get(i));
+                        if (unusedNodeDependencies.get(i).startsWith("* @")) {
+                            String s = unusedNodeDependencies.get(i).substring(3);
+                            unusedNodeDependencies.remove(i);
+                            unusedNodeDependencies.add(s);
+                        }
                     }
                 } else {
                     for (int j = 0; j < depcheckDependencies.size(); j++) {
                         unusedNodeDependencies.add(depcheckDependencies.get(j));
+                        if (unusedNodeDependencies.get(j).startsWith("* @")) {
+                            String s = unusedNodeDependencies.get(j).substring(3);
+                            unusedNodeDependencies.remove(j);
+                            unusedNodeDependencies.add(s);
+                        }
+                    }
+                }
+                //remove Error messages in List
+                for (int i = nodeDependencies.size() - 1; i >= 0; i--) {
+                    String errorMessage = nodeDependencies.get(i);
+                    if (errorMessage.contains("ERR")) {
+                        nodeDependencies.remove(i);
                     }
                 }
                 //if it doesnt contain the element it remains unchanged
                 unusedNodeDependencies.remove("Unused dependencies");
                 unusedNodeDependencies.remove("Unused devDependencies");
 
+                logger.info("Alle Dependencies:" + nodeDependencies);
+                logger.info("Unused Dependencies:" + unusedNodeDependencies);
                 return new NodeDependencyAnalysisResult(repositoryInformation, getUniqueName(), nodeDependencies, unusedNodeDependencies);
         }
 
@@ -196,9 +239,19 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
     }
 
     private String getNameOfDependency(ArrayList<String> allDependencies, int i) {
+        String dependency;
         String line = allDependencies.get(i);
         String splitValues[] = line.split("\\s");
-        String dependency = splitValues[1];
+        if (splitValues[1].equals("├──") || splitValues[1].equals("└──")) {
+            dependency = splitValues[2];
+        } else {
+            // if (line.contains("OPTIONAL") || line.contains("PEER")) {
+            //     dependency = splitValues[4];
+            // } else {
+            //     dependency = splitValues[3];
+            // }
+            dependency = splitValues[1];
+        }
         return dependency;
     }
 

@@ -49,9 +49,15 @@ public class GlobalActualDependencyStatisticGenerator implements TwoPhasesStatis
                     String allSplitValues[] = str.split("@");
                     String dependency = allSplitValues[0];
                     for (String str1 : entry.getUnusedDepcheckDependencies()) {
-                        String unusedSplitValues[] = str1.split("\\s");
-                        if (unusedSplitValues[1].equals(dependency)) {
-                            unusedDependencies = "\n-" + unusedSplitValues[1];
+                        if (!str1.contains("*")) {
+                            if (str1.equals(dependency)) {
+                                unusedDependencies = "\n-" + str1;
+                            }
+                        } else {
+                            String unusedSplitValues[] = str1.split("\\s");
+                            if (unusedSplitValues[1].equals(dependency)) {
+                                unusedDependencies = "\n-" + unusedSplitValues[1];
+                            }
                         }
                     }
                 }
@@ -121,10 +127,17 @@ public class GlobalActualDependencyStatisticGenerator implements TwoPhasesStatis
                 String dependency = allSplitValues[0];
                 if (!((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies().isEmpty()) {
                     for (String str2 : ((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies()) {
-                        String unusedSplitValues[] = str2.split("\\s");
-                        if (unusedSplitValues[1].equals(dependency)) {
-                            unusedDeps++;
-                            return new GeneratedStatisticInformation(statisticInformation, null, getUniqueName());
+                        if (!str2.contains("*")) {
+                            if (str2.equals(dependency)) {
+                                unusedDeps++;
+                                return new GeneratedStatisticInformation(statisticInformation, null, getUniqueName());
+                            }
+                        } else {
+                            String unusedSplitValues[] = str2.split("\\s");
+                            if (unusedSplitValues[1].equals(dependency)) {
+                                unusedDeps++;
+                                return new GeneratedStatisticInformation(statisticInformation, null, getUniqueName());
+                            }
                         }
                     }
                 }
