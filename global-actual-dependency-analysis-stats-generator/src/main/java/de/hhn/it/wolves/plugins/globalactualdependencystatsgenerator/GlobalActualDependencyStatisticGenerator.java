@@ -78,7 +78,7 @@ public class GlobalActualDependencyStatisticGenerator implements TwoPhasesStatis
             }
             if (e.getRepositoryInformation().getProgrammingLanguage().equals(ProgrammingLanguage.JAVA_SCRIPT)) {
                 sb.append(separator).append(e.getDepcheckDependencies().size());
-                if (e.getUnusedDepcheckDependencies().size() != 0) {
+                if (e.getUnusedDepcheckDependencies().size() != 0 && !e.getUnusedDepcheckDependencies().get(0).equals("No depcheck issue")) {
                     unused = e.getUnusedDepcheckDependencies().size();
                 }
             }
@@ -125,7 +125,7 @@ public class GlobalActualDependencyStatisticGenerator implements TwoPhasesStatis
             for (String str : ((NodeDependencyStatisticInformation) statisticInformation).getAllForwardedNodeDependencies()) {
                 String allSplitValues[] = str.split("@");
                 String dependency = allSplitValues[0];
-                if (!((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies().isEmpty()) {
+                if (!((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies().isEmpty() && ((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies().get(0).equals("No depcheck issue")==false) {
                     for (String str2 : ((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies()) {
                         if (!str2.contains("*")) {
                             if (str2.equals(dependency)) {

@@ -60,8 +60,9 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                         @Override
                         public void consumeLine(String line) throws IOException {
                             //       if (line.startsWith("[WARNING] Unused declared") || line.startsWith("[WARNING]    ")) {
-                            logger.info(line);
+
                             if (line.startsWith("[INFO]    ")) {
+                                logger.info(line);
                                 allMavenDependencies.add(line);
                             }
                         }
@@ -81,6 +82,7 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                     allArtifacts.add(buildArtifactFromString(allMavenDependencies, i));
                 }
 
+                request.setGoals(Collections.singletonList("dependency:analyze"));
                 ArrayList<String> unusedMavenDependencies = new ArrayList<>();
                 List<Artifact> unusedArtifacts = new ArrayList<>();
                 try {
@@ -89,7 +91,7 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                         @Override
                         public void consumeLine(String line) throws IOException {
                             if (line.startsWith("[WARNING] Unused declared") || line.startsWith("[WARNING]    ")) {
-
+                                logger.info(line);
                                 unusedMavenDependencies.add(line);
                             }
                         }
@@ -117,22 +119,10 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                 }
 
                 // ProcessBuilder pb = new ProcessBuilder("npm","list","-depth 0");
-                ProcessBuilder pb = new ProcessBuilder("/bin/bash", "-c", "npm install");
+                // WENN MAN LEERZEICHEN VERGISST; BRAUCHT MAN SICH NICHT WUNDERN WARUM NICHTS FUNKTIONIERT ;)))))))))))
+                ProcessBuilder pb = new ProcessBuilder("/bin/bash", "-c", "npm list -dev -prod -depth 0");
                 pb.directory(repositoryInformation.getLocalDownloadPath());
                 pb.redirectErrorStream(true);
-                Process p = null;
-                try {
-                    p = pb.start();
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                try {
-                    p.waitFor();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                pb.command("/bin/bash", "-c", "npm list -depth 0");
                 Process p3 = null;
                 try {
                     p3 = pb.start();
@@ -152,14 +142,14 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
 
                         //if (!((line = input.readLine()) != null)) break;
                         line = input.readLine();
-                        //logger.info("npm run information:" + line);
+                        logger.info("npm run information:" + line);
 
                         if (line == null) {
                             break;
 // Programm erreicht nie die else if Bedingung??? Darstellung dependency structure windows: +--
-                        } else if (line.contains("@") && !line.contains("UNMET") && line.charAt(1) == '─') {
+                        } else if (line.contains("@") && line.charAt(1) == '─') {
                             allNodeDependencies.add(line);
-                            logger.info("Inhalt Liste aller Dependencies: " + allNodeDependencies.toString());
+                            // logger.info("Inhalt Liste aller Dependencies: " + allNodeDependencies.toString());
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -191,7 +181,7 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                     try {
 
                         if (!((row = reader.readLine()) != null)) break;
-                        logger.info(line);
+                        logger.info(row);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -242,15 +232,19 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
         String dependency;
         String line = allDependencies.get(i);
         String splitValues[] = line.split("\\s");
-        if (splitValues[1].equals("├──") || splitValues[1].equals("└──")) {
-            dependency = splitValues[2];
+        if (!splitValues[1].equals("UNMET")) {
+            dependency = splitValues[1];
+            return dependency;
+        }
+        if (splitValues[3].equals("├──") || splitValues[3].equals("└──")) {
+            dependency = splitValues[6];
         } else {
             // if (line.contains("OPTIONAL") || line.contains("PEER")) {
             //     dependency = splitValues[4];
             // } else {
             //     dependency = splitValues[3];
             // }
-            dependency = splitValues[1];
+            dependency = splitValues[3];
         }
         return dependency;
     }
@@ -273,7 +267,7 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
         String line = pluginOutput.get(unusedDependencyIndex);
         String splitValues[] = line.split(":|\\s+");
         String groupId = splitValues[1];
-        String artifactId = splitValues[2];
+        String artifactId = splitValues[2];// ganz selten out of bounds?
         String type = splitValues[3];
         String version = splitValues[4];
         String scope = splitValues[5];

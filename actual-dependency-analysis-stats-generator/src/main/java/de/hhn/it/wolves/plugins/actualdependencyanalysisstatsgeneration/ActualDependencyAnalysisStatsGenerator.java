@@ -59,7 +59,7 @@ public class ActualDependencyAnalysisStatsGenerator implements StatisticGenerato
                 sb.append(dependency);
                 sb.append(seperator).append(version);
                 //die if Anweisung funktioniert nicht, da alle Projekte falsch im Ordner hinterlegt werden, einmal als projektname.csv und dann noch als [UNUSED] projektname.csv
-                if (((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies().isEmpty() == false) {
+                if (((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies().isEmpty() == false && ((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies().get(0).equals("No depcheck issue")==false) {
                     for (String str2 : ((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies()) {
                         if (!str2.contains("*")) {
                             logger.info("Angeblich unused : " + str2);
