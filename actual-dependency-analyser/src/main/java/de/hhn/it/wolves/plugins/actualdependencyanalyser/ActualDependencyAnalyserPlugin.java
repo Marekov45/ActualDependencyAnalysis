@@ -12,10 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
 
@@ -60,9 +57,9 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                         @Override
                         public void consumeLine(String line) throws IOException {
                             //       if (line.startsWith("[WARNING] Unused declared") || line.startsWith("[WARNING]    ")) {
+                            logger.info(line);
+                            if (line.startsWith("[INFO]    ") && !line.equals("[INFO]    none")) {
 
-                            if (line.startsWith("[INFO]    ")) {
-                                logger.info(line);
                                 allMavenDependencies.add(line);
                             }
                         }
@@ -84,6 +81,7 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
 
                 request.setGoals(Collections.singletonList("dependency:analyze"));
                 ArrayList<String> unusedMavenDependencies = new ArrayList<>();
+
                 List<Artifact> unusedArtifacts = new ArrayList<>();
                 try {
 
@@ -100,13 +98,16 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                 } catch (MavenInvocationException e) {
                     e.printStackTrace();
                 }
-
+                // ArrayList<String> unusedMavenList = new ArrayList<>();
+                // unusedMavenList.addAll(unusedMavenDependencies);
                 String mavenText = "[WARNING] Unused declared dependencies found:";
 
                 // check if repo has unused dependencies
                 if (unusedMavenDependencies.contains(mavenText)) {
                     for (int i = getUnusedDependencyIndex(unusedMavenDependencies, mavenText) + 1; i < unusedMavenDependencies.size(); i++) {
+                        //   if(!unusedMavenDependencies.get(i).contains("Unused declared")) {
                         unusedArtifacts.add(buildArtifactFromString(unusedMavenDependencies, i));
+                        //     }
                     }
                 }
                 return new MavenDependencyAnalysisResult(repositoryInformation, getUniqueName(), allArtifacts, unusedArtifacts);
@@ -119,7 +120,7 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                 }
 
                 // ProcessBuilder pb = new ProcessBuilder("npm","list","-depth 0");
-                // WENN MAN LEERZEICHEN VERGISST; BRAUCHT MAN SICH NICHT WUNDERN WARUM NICHTS FUNKTIONIERT ;)))))))))))
+
                 ProcessBuilder pb = new ProcessBuilder("/bin/bash", "-c", "npm list -dev -prod -depth 0");
                 pb.directory(repositoryInformation.getLocalDownloadPath());
                 pb.redirectErrorStream(true);
@@ -232,6 +233,9 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
         String dependency;
         String line = allDependencies.get(i);
         String splitValues[] = line.split("\\s");
+        if (line.contains("OPTIONAL") || line.contains("PEER")) {
+            return dependency = splitValues[4];
+        }
         if (!splitValues[1].equals("UNMET")) {
             dependency = splitValues[1];
             return dependency;
