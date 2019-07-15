@@ -44,11 +44,20 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                 }
                 logger.info("Starting Maven process for " + pomFile.getAbsolutePath());
                 request.setPomFile(pomFile);
-                //  request.setGoals(Collections.singletonList("dependency:analyze"));
-                request.setGoals(Collections.singletonList("dependency:list"));
 
                 Invoker invoker = new DefaultInvoker();
                 invoker.setMavenHome(new File("/usr/share/maven"));
+               // request.setGoals(Collections.singletonList("clean install"));
+                //try {
+               //     invoker.execute(request);
+                //} catch (MavenInvocationException e) {
+              //      e.printStackTrace();
+               // }
+
+
+                request.setGoals(Collections.singletonList("dependency:list"));
+
+
                 ArrayList<String> allMavenDependencies = new ArrayList<>();
                 List<Artifact> allArtifacts = new ArrayList<>();
                 try {
@@ -61,6 +70,10 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                             if (line.startsWith("[INFO]    ") && !line.equals("[INFO]    none")) {
 
                                 allMavenDependencies.add(line);
+                            } else if (line.startsWith("[ERROR]")) {
+                                logger.info("The build failed for the project" + repositoryInformation.getName() + ". It will be excluded from the analysis");
+                                allMavenDependencies.add(line);
+                                return;
                             }
                         }
                     });
@@ -68,7 +81,12 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                 } catch (MavenInvocationException e) {
                     e.printStackTrace();
                 }
-
+                //check if list contains an error, if thats the case, remove project from analysis
+                for (String element : allMavenDependencies) {
+                    if (element.startsWith("[ERROR")) {
+                        return new AnalysisResultWithoutProcessing(repositoryInformation, getUniqueName());
+                    }
+                }
                 //   String mavenText = "[WARNING] Unused declared dependencies found:";
                 //   if (!mavenPluginOutput.contains(mavenText)) {
                 //       logger.info("This project has no unused declared dependencies.");
