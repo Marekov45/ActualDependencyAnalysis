@@ -35,45 +35,37 @@ public class GlobalActualDependencyStatisticGenerator implements TwoPhasesStatis
         String separator = ";";
         logger.info("WE FOUND:\n{} projects with unused dependencies\n{} projects without unused dependencies", unusedDeps, noUnusedDeps);
         for (Entry entry : dependencies) {
-
+            String unusedDependencies = "";
             if (entry.getRepositoryInformation().getProgrammingLanguage().equals(ProgrammingLanguage.JAVA)) {
-                List<Artifact> unusedDependencies = new ArrayList<>();
+             //   List<Artifact> unusedDependencies = new ArrayList<>();
                 for (Artifact artifact : entry.getMavenDependencies()) {
                     for (Artifact artifact1 : entry.getUnusedMavenDependencies()) {
                         if (artifact1.equals(artifact)) {
-                            unusedDependencies.add(artifact1); //evtl. noch groupId etc. hinzufügen
+                            unusedDependencies += "\n-" + artifact1.getArtifactId(); //evtl. noch groupId etc. hinzufügen
                         }
                     }
                 }
-                logger.info("For " + entry.getRepositoryInformation().getName() + " we found the following unused Dependencies:" +"\n");
-                for (Artifact element : unusedDependencies) {
-                    logger.info(element + "\n");
-                }
             } else if (entry.getRepositoryInformation().getProgrammingLanguage().equals(ProgrammingLanguage.JAVA_SCRIPT)) {
-                List<String> unusedDependencies = new ArrayList<>();
+               // List<String> unusedDependencies = new ArrayList<>();
                 for (String str : entry.getDepcheckDependencies()) {
                     String allSplitValues[] = str.split("@");
                     String dependency = allSplitValues[0];
                     for (String str1 : entry.getUnusedDepcheckDependencies()) {
                         if (!str1.contains("*")) {
                             if (str1.equals(dependency)) {
-                                unusedDependencies.add(str1);
+                                unusedDependencies += "\n-" + str1;
                             }
                         } else {
                             String unusedSplitValues[] = str1.split("\\s");
                             if (unusedSplitValues[1].equals(dependency)) {
-                                unusedDependencies.add(unusedSplitValues[1]);
+                                unusedDependencies += "\n-" + unusedSplitValues[1];
                             }
                         }
                     }
 
                 }
-                logger.info("For " + entry.getRepositoryInformation().getName() + " we found the following unused Dependencies:" + "\n");
-                for (String element : unusedDependencies) {
-                    logger.info(element + "\n");
-                }
             }
-
+            logger.info("For " + entry.getRepositoryInformation().getName() + " we found the following unused Dependencies:" + unusedDependencies);
         }
         List<String> csvLines = new ArrayList<>();
         csvLines.add("Name of Repository;Programming language;Dependency count;Unused");
