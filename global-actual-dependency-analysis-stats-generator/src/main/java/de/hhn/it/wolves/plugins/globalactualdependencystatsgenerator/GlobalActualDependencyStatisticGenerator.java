@@ -2,6 +2,7 @@ package de.hhn.it.wolves.plugins.globalactualdependencystatsgenerator;
 
 import de.hhn.it.wolves.components.TwoPhasesStatisticGeneratorPlugin;
 import de.hhn.it.wolves.domain.*;
+import de.hhn.it.wolves.plugins.actualdependencyanalyser.ActualDependencyAnalyserPlugin;
 import de.hhn.it.wolves.plugins.actualdependencyanalysisprocessing.MavenDependencyStatisticInformation;
 import de.hhn.it.wolves.plugins.actualdependencyanalysisprocessing.NodeDependencyStatisticInformation;
 import org.apache.maven.artifact.Artifact;
@@ -28,12 +29,14 @@ public class GlobalActualDependencyStatisticGenerator implements TwoPhasesStatis
     private int unusedDeps;
     private int noUnusedDeps;
 
+
     //startet diese Phase erst wenn alle projekte abgearbeitet wurden?
     //evtl noch überprüfen ob überhaupt unused dependencies vorhanden sind damit die schleife nicht umsonst durchlaufen wird
     @Override
     public void startOperationInPhaseTwo(File file) {
         String separator = ";";
         logger.info("WE FOUND:\n{} projects with unused dependencies\n{} projects without unused dependencies", unusedDeps, noUnusedDeps);
+        logger.info(ActualDependencyAnalyserPlugin.getBuildFailures() + " projects had a build failure and were excluded from the analysis.");
         for (Entry entry : dependencies) {
             String unusedDependencies = "";
             if (entry.getRepositoryInformation().getProgrammingLanguage().equals(ProgrammingLanguage.JAVA)) {

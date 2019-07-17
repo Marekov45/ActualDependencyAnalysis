@@ -20,10 +20,8 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
     private static final Logger logger = LoggerFactory.getLogger(ActualDependencyAnalyserPlugin.class.getName());
     private static final String POM_FILE = "/pom.xml";
     private static final String JSON_FILE = "/package.json";
-    private File workingDirectory;
+    private static int buildFailures = 0;
 
-    private FrameworkManager frameworkManager;
-    private Properties properties;
 
     public void init(FrameworkManager frameworkManager) {
 
@@ -75,6 +73,9 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                 //check if list contains an error, if thats the case, remove project from analysis
                 for (String element : allMavenDependencies) {
                     if (element.startsWith("[ERROR")) {
+                        //when all repositories have been analyzed, the log will display the amount of projects that have been skipped
+                        // because of a build failure
+                        buildFailures++;
                         return new AnalysisResultWithoutProcessing(repositoryInformation, getUniqueName());
                     }
                 }
@@ -137,7 +138,7 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                 }
                 //convert set back to list for further processing
                 List<Artifact> noDuplicateUnusedDeps = new ArrayList(noDuplicateUnusedArtifacts);
-                logger.info("Liste ohne Duplikate: "+ noDuplicateUnusedDeps);
+                logger.info("Liste ohne Duplikate: " + noDuplicateUnusedDeps);
                 return new MavenDependencyAnalysisResult(repositoryInformation, getUniqueName(), noDuplicateAllDeps, noDuplicateUnusedDeps);
 
             case JAVA_SCRIPT:
@@ -297,6 +298,10 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
         Artifact artifact = new DefaultArtifact(groupId, artifactId, version, scope, type, null, new DefaultArtifactHandler());
         return artifact;
 
+    }
+
+    public static int getBuildFailures() {
+        return buildFailures;
     }
 
 
