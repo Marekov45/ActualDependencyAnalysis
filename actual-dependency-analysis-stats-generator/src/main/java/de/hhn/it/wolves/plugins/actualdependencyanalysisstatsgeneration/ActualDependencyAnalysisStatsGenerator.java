@@ -4,6 +4,7 @@ import de.hhn.it.wolves.components.StatisticGeneratorPlugin;
 import de.hhn.it.wolves.domain.FrameworkManager;
 import de.hhn.it.wolves.domain.GeneratedStatisticInformation;
 import de.hhn.it.wolves.domain.StatisticInformation;
+import de.hhn.it.wolves.plugins.actualdependencyanalyser.ActualDependencyAnalyserPlugin;
 import de.hhn.it.wolves.plugins.actualdependencyanalysisprocessing.MavenDependencyStatisticInformation;
 import de.hhn.it.wolves.plugins.actualdependencyanalysisprocessing.NodeDependencyStatisticInformation;
 import org.apache.commons.io.FileUtils;
@@ -28,8 +29,8 @@ public class ActualDependencyAnalysisStatsGenerator implements StatisticGenerato
     @Override
     public GeneratedStatisticInformation generateStatistic(File file, String s, StatisticInformation statisticInformation) {
         String seperator = ";";
-       // Set<Artifact> noDuplicateAllArtifacts = new LinkedHashSet<>();
-       // Set<Artifact> noDuplicateUnusedArtifacts = new LinkedHashSet<>();
+        // Set<Artifact> noDuplicateAllArtifacts = new LinkedHashSet<>();
+        // Set<Artifact> noDuplicateUnusedArtifacts = new LinkedHashSet<>();
         List<String> lines = new ArrayList<>();
         lines.add("Dependency;Version;Module;Unused");
         boolean foundUnused = false;
@@ -53,10 +54,11 @@ public class ActualDependencyAnalysisStatsGenerator implements StatisticGenerato
                     lines.add(sb.toString());
                 }
             } else if (((MavenDependencyStatisticInformation) statisticInformation).isMultiModule()) {
-                String appendix = "";
-                List<Artifact> test = new ArrayList<>();
-                for(int i=0; i < ((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().size();i++){
-                    test.add(((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().get(i));
+                String moduleName = "";
+                //create copied list of unused dependencies so elements can be safely removed without changing the original list for global stats later
+                List<Artifact> unusedDepsCopy = new ArrayList<>();
+                for (int i = 0; i < ((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().size(); i++) {
+                    unusedDepsCopy.add(((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().get(i));
                 }
                 for (Artifact artifact : ((MavenDependencyStatisticInformation) statisticInformation).getAllForwardedMavenDependencies()) {
                     StringBuilder builder = new StringBuilder(artifact.getArtifactId());
@@ -64,16 +66,17 @@ public class ActualDependencyAnalysisStatsGenerator implements StatisticGenerato
                     if (((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().isEmpty()) {
                         builder.append(seperator).append(" ");
                     } else {
-                        for (Artifact module : test) {
-                            if (module.getVersion().equals("") && !appendix.equals(module.getArtifactId())) {
-                                appendix = module.getArtifactId();
+                        for (Iterator<Artifact> iterator = unusedDepsCopy.iterator(); iterator.hasNext(); ) {
+                            Artifact module = iterator.next();
+                            if (module.getVersion().equals("No version") && !moduleName.equals(module.getArtifactId())) {
+                                moduleName = module.getArtifactId();
                                 // ((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().remove(module);
                             } else {
                                 if (module.equals(artifact)) {
-                                    builder.append(seperator).append(appendix);
+                                    builder.append(seperator).append(moduleName);
                                     builder.append(seperator).append("X");
                                     // is this bad practice?
-                                    test.remove(module);
+                                    iterator.remove();
                                     break;
                                 }
                             }
@@ -82,7 +85,15 @@ public class ActualDependencyAnalysisStatsGenerator implements StatisticGenerato
                     }
                     lines.add(builder.toString());
                 }
-
+                //get rid of modules in unused dependencies list to have correct global stats
+                for (int i = 0; i < ActualDependencyAnalyserPlugin.getTransformedModules().size(); i++) {
+                    for (int j = ((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().size()-1; j >= 0; j--) {
+                        if (((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().get(j).equals(ActualDependencyAnalyserPlugin.getTransformedModules().get(i))) {
+                            ((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().remove(j);
+                        }
+                    }
+                }
+                logger.info("list mit unused Dependencies: " + ((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies());
             }
         } else if ((statisticInformation instanceof NodeDependencyStatisticInformation)) {
             for (String str : ((NodeDependencyStatisticInformation) statisticInformation).getAllForwardedNodeDependencies()) {
@@ -131,7 +142,7 @@ public class ActualDependencyAnalysisStatsGenerator implements StatisticGenerato
                 writer = new BufferedWriter(new FileWriter(file.getAbsolutePath() + "/" + s + ".csv"));
             }
             //sort alphabetically for better overview
-            Collections.sort(lines.subList(1,lines.size()));
+            Collections.sort(lines.subList(1, lines.size()));
             for (String string : lines) {
                 writer.write(string);
                 writer.newLine();

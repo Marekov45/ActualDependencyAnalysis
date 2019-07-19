@@ -4,24 +4,14 @@
     <list default="true" id="c9f7aba8-f6fe-4cdb-8f90-f41044d2f9cb" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/actual-dependency-analyser/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/ActualDependencyAnalyserPlugin.java" beforeDir="false" afterPath="$PROJECT_DIR$/actual-dependency-analyser/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/ActualDependencyAnalyserPlugin.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/actual-dependency-analyser/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/MavenDependencyAnalysisResult.java" beforeDir="false" afterPath="$PROJECT_DIR$/actual-dependency-analyser/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/MavenDependencyAnalysisResult.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/actual-dependency-analyser/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/NodeDependencyAnalysisResult.java" beforeDir="false" afterPath="$PROJECT_DIR$/actual-dependency-analyser/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/NodeDependencyAnalysisResult.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/actual-dependency-analyser/target/actual-dependency-analyser-1.0-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/actual-dependency-analyser/target/actual-dependency-analyser-1.0-SNAPSHOT.jar" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/actual-dependency-analyser/target/classes/de/hhn/it/wolves/plugins/actualdependencyanalyser/ActualDependencyAnalyserPlugin$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/actual-dependency-analyser/target/classes/de/hhn/it/wolves/plugins/actualdependencyanalyser/ActualDependencyAnalyserPlugin$1.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/actual-dependency-analyser/target/classes/de/hhn/it/wolves/plugins/actualdependencyanalyser/ActualDependencyAnalyserPlugin$2.class" beforeDir="false" afterPath="$PROJECT_DIR$/actual-dependency-analyser/target/classes/de/hhn/it/wolves/plugins/actualdependencyanalyser/ActualDependencyAnalyserPlugin$2.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/actual-dependency-analyser/target/classes/de/hhn/it/wolves/plugins/actualdependencyanalyser/ActualDependencyAnalyserPlugin$3.class" beforeDir="false" afterPath="$PROJECT_DIR$/actual-dependency-analyser/target/classes/de/hhn/it/wolves/plugins/actualdependencyanalyser/ActualDependencyAnalyserPlugin$3.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/actual-dependency-analyser/target/classes/de/hhn/it/wolves/plugins/actualdependencyanalyser/ActualDependencyAnalyserPlugin.class" beforeDir="false" afterPath="$PROJECT_DIR$/actual-dependency-analyser/target/classes/de/hhn/it/wolves/plugins/actualdependencyanalyser/ActualDependencyAnalyserPlugin.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/actual-dependency-analyser/target/classes/de/hhn/it/wolves/plugins/actualdependencyanalyser/MavenDependencyAnalysisResult.class" beforeDir="false" afterPath="$PROJECT_DIR$/actual-dependency-analyser/target/classes/de/hhn/it/wolves/plugins/actualdependencyanalyser/MavenDependencyAnalysisResult.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/actual-dependency-analyser/target/classes/de/hhn/it/wolves/plugins/actualdependencyanalyser/NodeDependencyAnalysisResult.class" beforeDir="false" afterPath="$PROJECT_DIR$/actual-dependency-analyser/target/classes/de/hhn/it/wolves/plugins/actualdependencyanalyser/NodeDependencyAnalysisResult.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/actual-dependency-analyser/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/actual-dependency-analyser/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/actual-dependency-analyser/target/shaded-actual-dependency-analyser-1.0-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/actual-dependency-analyser/target/shaded-actual-dependency-analyser-1.0-SNAPSHOT.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/actual-dependency-analysis-result-consumer/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalysisprocessing/ActualDependencyAnalysisResultConsumer.java" beforeDir="false" afterPath="$PROJECT_DIR$/actual-dependency-analysis-result-consumer/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalysisprocessing/ActualDependencyAnalysisResultConsumer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/actual-dependency-analysis-result-consumer/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalysisprocessing/MavenDependencyStatisticInformation.java" beforeDir="false" afterPath="$PROJECT_DIR$/actual-dependency-analysis-result-consumer/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalysisprocessing/MavenDependencyStatisticInformation.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/actual-dependency-analysis-result-consumer/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalysisprocessing/NodeDependencyStatisticInformation.java" beforeDir="false" afterPath="$PROJECT_DIR$/actual-dependency-analysis-result-consumer/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalysisprocessing/NodeDependencyStatisticInformation.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/actual-dependency-analysis-result-consumer/target/actual-dependency-analysis-result-consumer-1.0-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/actual-dependency-analysis-result-consumer/target/actual-dependency-analysis-result-consumer-1.0-SNAPSHOT.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/actual-dependency-analysis-result-consumer/target/classes/de/hhn/it/wolves/plugins/actualdependencyanalysisprocessing/ActualDependencyAnalysisResultConsumer.class" beforeDir="false" afterPath="$PROJECT_DIR$/actual-dependency-analysis-result-consumer/target/classes/de/hhn/it/wolves/plugins/actualdependencyanalysisprocessing/ActualDependencyAnalysisResultConsumer.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/actual-dependency-analysis-result-consumer/target/classes/de/hhn/it/wolves/plugins/actualdependencyanalysisprocessing/MavenDependencyStatisticInformation.class" beforeDir="false" afterPath="$PROJECT_DIR$/actual-dependency-analysis-result-consumer/target/classes/de/hhn/it/wolves/plugins/actualdependencyanalysisprocessing/MavenDependencyStatisticInformation.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/actual-dependency-analysis-result-consumer/target/classes/de/hhn/it/wolves/plugins/actualdependencyanalysisprocessing/NodeDependencyStatisticInformation.class" beforeDir="false" afterPath="$PROJECT_DIR$/actual-dependency-analysis-result-consumer/target/classes/de/hhn/it/wolves/plugins/actualdependencyanalysisprocessing/NodeDependencyStatisticInformation.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/actual-dependency-analysis-result-consumer/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/actual-dependency-analysis-result-consumer/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/actual-dependency-analysis-result-consumer/target/shaded-actual-dependency-analysis-result-consumer-1.0-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/actual-dependency-analysis-result-consumer/target/shaded-actual-dependency-analysis-result-consumer-1.0-SNAPSHOT.jar" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/actual-dependency-analysis-stats-generator/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalysisstatsgeneration/ActualDependencyAnalysisStatsGenerator.java" beforeDir="false" afterPath="$PROJECT_DIR$/actual-dependency-analysis-stats-generator/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalysisstatsgeneration/ActualDependencyAnalysisStatsGenerator.java" afterDir="false" />
@@ -29,9 +19,6 @@
       <change beforePath="$PROJECT_DIR$/actual-dependency-analysis-stats-generator/target/classes/de/hhn/it/wolves/plugins/actualdependencyanalysisstatsgeneration/ActualDependencyAnalysisStatsGenerator.class" beforeDir="false" afterPath="$PROJECT_DIR$/actual-dependency-analysis-stats-generator/target/classes/de/hhn/it/wolves/plugins/actualdependencyanalysisstatsgeneration/ActualDependencyAnalysisStatsGenerator.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/actual-dependency-analysis-stats-generator/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/actual-dependency-analysis-stats-generator/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/actual-dependency-analysis-stats-generator/target/shaded-actual-dependency-analysis-stats-generator-1.0-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/actual-dependency-analysis-stats-generator/target/shaded-actual-dependency-analysis-stats-generator-1.0-SNAPSHOT.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/global-actual-dependency-analysis-stats-generator/src/main/java/de/hhn/it/wolves/plugins/globalactualdependencystatsgenerator/GlobalActualDependencyStatisticGenerator.java" beforeDir="false" afterPath="$PROJECT_DIR$/global-actual-dependency-analysis-stats-generator/src/main/java/de/hhn/it/wolves/plugins/globalactualdependencystatsgenerator/GlobalActualDependencyStatisticGenerator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/global-actual-dependency-analysis-stats-generator/target/classes/de/hhn/it/wolves/plugins/globalactualdependencystatsgenerator/GlobalActualDependencyStatisticGenerator$Entry.class" beforeDir="false" afterPath="$PROJECT_DIR$/global-actual-dependency-analysis-stats-generator/target/classes/de/hhn/it/wolves/plugins/globalactualdependencystatsgenerator/GlobalActualDependencyStatisticGenerator$Entry.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/global-actual-dependency-analysis-stats-generator/target/classes/de/hhn/it/wolves/plugins/globalactualdependencystatsgenerator/GlobalActualDependencyStatisticGenerator.class" beforeDir="false" afterPath="$PROJECT_DIR$/global-actual-dependency-analysis-stats-generator/target/classes/de/hhn/it/wolves/plugins/globalactualdependencystatsgenerator/GlobalActualDependencyStatisticGenerator.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/global-actual-dependency-analysis-stats-generator/target/global-actual-dependency-analysis-stats-generator-1.0-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/global-actual-dependency-analysis-stats-generator/target/global-actual-dependency-analysis-stats-generator-1.0-SNAPSHOT.jar" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/global-actual-dependency-analysis-stats-generator/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/global-actual-dependency-analysis-stats-generator/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/global-actual-dependency-analysis-stats-generator/target/shaded-global-actual-dependency-analysis-stats-generator-1.0-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/global-actual-dependency-analysis-stats-generator/target/shaded-global-actual-dependency-analysis-stats-generator-1.0-SNAPSHOT.jar" afterDir="false" />
@@ -53,29 +40,27 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/actual-dependency-analysis-stats-generator/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalysisstatsgeneration/ActualDependencyAnalysisStatsGenerator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="130">
-              <caret line="54" column="23" selection-start-line="54" selection-start-column="23" selection-end-line="54" selection-end-column="99" />
+            <state relative-caret-position="246">
+              <caret line="38" lean-forward="true" selection-start-line="38" selection-end-line="38" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#8798#8799#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/global-actual-dependency-analysis-stats-generator/src/main/java/de/hhn/it/wolves/plugins/globalactualdependencystatsgenerator/GlobalActualDependencyStatisticGenerator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="317">
-              <caret line="112" column="42" selection-start-line="112" selection-start-column="42" selection-end-line="112" selection-end-column="42" />
+            <state relative-caret-position="357">
+              <caret line="40" column="71" selection-start-line="40" selection-start-column="71" selection-end-line="40" selection-end-column="71" />
               <folding>
                 <element signature="imports" expanded="true" />
+                <element signature="e#11463#11464#0" expanded="true" />
                 <element signature="e#11497#11498#0" expanded="true" />
-                <element signature="e#12404#12405#0" expanded="true" />
-                <element signature="e#12448#12449#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -84,7 +69,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/actual-dependency-analysis-result-consumer/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalysisprocessing/ActualDependencyAnalysisResultConsumer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="609">
+            <state relative-caret-position="544">
               <caret line="37" selection-start-line="37" selection-end-line="37" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -105,7 +90,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/actual-dependency-analyser/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/NodeDependencyAnalysisResult.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="203">
+            <state relative-caret-position="136">
               <caret line="12" column="30" selection-start-line="12" selection-start-column="30" selection-end-line="12" selection-end-column="30" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -117,7 +102,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/actual-dependency-analysis-result-consumer/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalysisprocessing/NodeDependencyStatisticInformation.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="187">
+            <state relative-caret-position="136">
               <caret line="11" column="25" selection-start-line="11" selection-start-column="25" selection-end-line="11" selection-end-column="25" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -129,14 +114,16 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/actual-dependency-analyser/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/ActualDependencyAnalyserPlugin.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2031">
-              <caret line="121" column="29" selection-start-line="121" selection-start-column="29" selection-end-line="121" selection-end-column="29" />
+            <state relative-caret-position="301">
+              <caret line="59" lean-forward="true" selection-start-line="59" selection-end-line="59" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#17775#17776#0" expanded="true" />
-                <element signature="e#17851#17852#0" expanded="true" />
-                <element signature="e#17952#17953#0" expanded="true" />
-                <element signature="e#18205#18206#0" expanded="true" />
+                <element signature="e#20183#20184#0" expanded="true" />
+                <element signature="e#20259#20260#0" expanded="true" />
+                <element signature="e#20360#20361#0" expanded="true" />
+                <element signature="e#19644#19645#0" expanded="true" />
+                <element signature="e#19692#19693#0" expanded="true" />
+                <element signature="e#20721#20722#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -145,7 +132,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pom.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="55">
+            <state relative-caret-position="153">
               <caret line="9" selection-start-line="9" selection-end-line="9" />
             </state>
           </provider>
@@ -154,7 +141,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/actual-dependency-analyser/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/MavenDependencyAnalysisResult.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="391">
+            <state relative-caret-position="323">
               <caret line="25" selection-start-line="25" selection-end-line="25" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -208,9 +195,9 @@
         <option value="$PROJECT_DIR$/actual-dependency-analyser/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/NodeDependencyAnalysisResult.java" />
         <option value="$PROJECT_DIR$/actual-dependency-analysis-result-consumer/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalysisprocessing/NodeDependencyStatisticInformation.java" />
         <option value="$PROJECT_DIR$/actual-dependency-analysis-result-consumer/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalysisprocessing/ActualDependencyAnalysisResultConsumer.java" />
+        <option value="$PROJECT_DIR$/global-actual-dependency-analysis-stats-generator/src/main/java/de/hhn/it/wolves/plugins/globalactualdependencystatsgenerator/GlobalActualDependencyStatisticGenerator.java" />
         <option value="$PROJECT_DIR$/actual-dependency-analyser/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/ActualDependencyAnalyserPlugin.java" />
         <option value="$PROJECT_DIR$/actual-dependency-analysis-stats-generator/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalysisstatsgeneration/ActualDependencyAnalysisStatsGenerator.java" />
-        <option value="$PROJECT_DIR$/global-actual-dependency-analysis-stats-generator/src/main/java/de/hhn/it/wolves/plugins/globalactualdependencystatsgenerator/GlobalActualDependencyStatisticGenerator.java" />
       </list>
     </option>
   </component>
@@ -272,6 +259,7 @@
     </navigator>
     <panes>
       <pane id="PackagesPane" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -690,7 +678,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -798,17 +785,19 @@
       <workItem from="1563104701966" duration="2346000" />
       <workItem from="1563203205779" duration="6088000" />
       <workItem from="1563378162022" duration="3552000" />
-      <workItem from="1563453034698" duration="32092000" />
+      <workItem from="1563453034698" duration="32248000" />
+      <workItem from="1563537967873" duration="16860000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="233037000" />
+    <option name="totallyTimeSpent" value="250053000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.26385927" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.26652452" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -817,8 +806,8 @@
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info id="Learn" order="7" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.3285968" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.32666665" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.32777777" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.32666665" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -835,7 +824,7 @@
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="Palette" order="3" />
       <window_info anchor="right" id="Theme Preview" order="4" />
-      <window_info anchor="right" id="Maven" order="5" visible="true" weight="0.15831557" />
+      <window_info active="true" anchor="right" id="Maven" order="5" visible="true" weight="0.15831557" />
       <window_info anchor="right" id="Capture Analysis" order="6" />
       <window_info anchor="right" id="Palette&#9;" order="7" />
       <window_info anchor="right" id="Database" order="8" />
@@ -1109,23 +1098,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pom.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="55">
-          <caret line="9" selection-start-line="9" selection-end-line="9" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/actual-dependency-analyser/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/MavenDependencyAnalysisResult.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="391">
-          <caret line="25" selection-start-line="25" selection-end-line="25" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/de/hhn/it/wolves/wolves-components/1.1-SNAPSHOT/wolves-components-1.1-SNAPSHOT.jar!/de/hhn/it/wolves/components/TwoPhasesStatisticGeneratorPlugin.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="119">
@@ -1133,36 +1105,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/actual-dependency-analysis-result-consumer/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalysisprocessing/NodeDependencyStatisticInformation.java">
+    <entry file="file://$PROJECT_DIR$/actual-dependency-analysis-result-consumer/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalysisprocessing/ActualDependencyAnalysisResultConsumer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="11" column="25" selection-start-line="11" selection-start-column="25" selection-end-line="11" selection-end-column="25" />
+        <state relative-caret-position="544">
+          <caret line="37" selection-start-line="37" selection-end-line="37" />
           <folding>
             <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/actual-dependency-analyser/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/NodeDependencyAnalysisResult.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="203">
-          <caret line="12" column="30" selection-start-line="12" selection-start-column="30" selection-end-line="12" selection-end-column="30" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/actual-dependency-analyser/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/ActualDependencyAnalyserPlugin.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2031">
-          <caret line="121" column="29" selection-start-line="121" selection-start-column="29" selection-end-line="121" selection-end-column="29" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#17775#17776#0" expanded="true" />
-            <element signature="e#17851#17852#0" expanded="true" />
-            <element signature="e#17952#17953#0" expanded="true" />
-            <element signature="e#18205#18206#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1174,36 +1122,77 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/actual-dependency-analysis-result-consumer/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalysisprocessing/ActualDependencyAnalysisResultConsumer.java">
+    <entry file="file://$PROJECT_DIR$/actual-dependency-analyser/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/NodeDependencyAnalysisResult.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="609">
-          <caret line="37" selection-start-line="37" selection-end-line="37" />
+        <state relative-caret-position="136">
+          <caret line="12" column="30" selection-start-line="12" selection-start-column="30" selection-end-line="12" selection-end-column="30" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/actual-dependency-analysis-stats-generator/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalysisstatsgeneration/ActualDependencyAnalysisStatsGenerator.java">
+    <entry file="file://$PROJECT_DIR$/actual-dependency-analysis-result-consumer/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalysisprocessing/NodeDependencyStatisticInformation.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="130">
-          <caret line="54" column="23" selection-start-line="54" selection-start-column="23" selection-end-line="54" selection-end-column="99" />
+        <state relative-caret-position="136">
+          <caret line="11" column="25" selection-start-line="11" selection-start-column="25" selection-end-line="11" selection-end-column="25" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#8798#8799#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="9" selection-start-line="9" selection-end-line="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/actual-dependency-analyser/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/MavenDependencyAnalysisResult.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="323">
+          <caret line="25" selection-start-line="25" selection-end-line="25" />
+          <folding>
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/global-actual-dependency-analysis-stats-generator/src/main/java/de/hhn/it/wolves/plugins/globalactualdependencystatsgenerator/GlobalActualDependencyStatisticGenerator.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="317">
-          <caret line="112" column="42" selection-start-line="112" selection-start-column="42" selection-end-line="112" selection-end-column="42" />
+        <state relative-caret-position="357">
+          <caret line="40" column="71" selection-start-line="40" selection-start-column="71" selection-end-line="40" selection-end-column="71" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="e#11463#11464#0" expanded="true" />
             <element signature="e#11497#11498#0" expanded="true" />
-            <element signature="e#12404#12405#0" expanded="true" />
-            <element signature="e#12448#12449#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/actual-dependency-analyser/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalyser/ActualDependencyAnalyserPlugin.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="301">
+          <caret line="59" lean-forward="true" selection-start-line="59" selection-end-line="59" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#20183#20184#0" expanded="true" />
+            <element signature="e#20259#20260#0" expanded="true" />
+            <element signature="e#20360#20361#0" expanded="true" />
+            <element signature="e#19644#19645#0" expanded="true" />
+            <element signature="e#19692#19693#0" expanded="true" />
+            <element signature="e#20721#20722#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/actual-dependency-analysis-stats-generator/src/main/java/de/hhn/it/wolves/plugins/actualdependencyanalysisstatsgeneration/ActualDependencyAnalysisStatsGenerator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="246">
+          <caret line="38" lean-forward="true" selection-start-line="38" selection-end-line="38" />
+          <folding>
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
