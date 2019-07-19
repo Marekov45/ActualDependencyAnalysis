@@ -9,11 +9,13 @@ public class NodeDependencyStatisticInformation extends StatisticInformation {
 
     private final List<String> allForwardedNodeDependencies;
     private final List<String> unusedForwardedNodeDependencies;
+    private boolean isMultiModule;
 
-    public NodeDependencyStatisticInformation(AnalysisResult analysisResult, String processedPluginName, List<String> allForwardedNodeDependencies, List<String> unusedForwardedNodeDependencies) {
+    public NodeDependencyStatisticInformation(AnalysisResult analysisResult, String processedPluginName, List<String> allForwardedNodeDependencies, List<String> unusedForwardedNodeDependencies,boolean isMultiModule) {
         super(analysisResult, processedPluginName);
         this.allForwardedNodeDependencies = allForwardedNodeDependencies;
         this.unusedForwardedNodeDependencies = unusedForwardedNodeDependencies;
+        this.isMultiModule = isMultiModule;
     }
 
     public List<String> getAllForwardedNodeDependencies() {
@@ -22,5 +24,9 @@ public class NodeDependencyStatisticInformation extends StatisticInformation {
 
     public List<String> getUnusedForwardedNodeDependencies() {
         return unusedForwardedNodeDependencies;
+    }
+
+    public boolean isMultiModule() {
+        return isMultiModule;
     }
 }

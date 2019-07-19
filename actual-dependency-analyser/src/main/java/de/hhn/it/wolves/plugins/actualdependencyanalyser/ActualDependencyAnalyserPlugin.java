@@ -3,9 +3,13 @@ package de.hhn.it.wolves.plugins.actualdependencyanalyser;
 import de.hhn.it.wolves.components.AnalysisPlugin;
 import de.hhn.it.wolves.domain.*;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.invoker.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +25,8 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
     private static final String POM_FILE = "/pom.xml";
     private static final String JSON_FILE = "/package.json";
     private static int buildFailures = 0;
+    private static int multiModule = 0;
+    private static List<String> multiModuleProjects = new ArrayList<>();
 
 
     public void init(FrameworkManager frameworkManager) {
@@ -31,16 +37,19 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
         switch (repositoryInformation.getProgrammingLanguage()) {
             case JAVA:
 
+
                 InvocationRequest request = new DefaultInvocationRequest();
                 request.setBatchMode(true);
 
                 File pomFile = new File(repositoryInformation.getLocalDownloadPath() + POM_FILE);
+
                 if (!pomFile.exists()) {
                     logger.info("We could not a find a pom file for" + repositoryInformation.getName() + ", thus it will be excluded from the analysis.");
                     return new AnalysisResultWithoutProcessing(repositoryInformation, getUniqueName());
                 }
                 logger.info("Starting Maven process for " + pomFile.getAbsolutePath());
                 request.setPomFile(pomFile);
+
 
                 Invoker invoker = new DefaultInvoker();
                 invoker.setMavenHome(new File("/usr/share/maven"));
@@ -55,7 +64,7 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                     invoker.setOutputHandler(new InvocationOutputHandler() {
                         @Override
                         public void consumeLine(String line) throws IOException {
-                            logger.info(line);
+                          //  logger.info(line);
                             if (line.startsWith("[INFO]    ") && !line.equals("[INFO]    none")) {
 
                                 allMavenDependencies.add(line);
@@ -85,18 +94,22 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                 }
 
                 //get rid of duplicated Dependencies
-                Set<Artifact> noDuplicateAllArtifacts = new LinkedHashSet<>();
+               // Set<Artifact> noDuplicateAllArtifacts = new LinkedHashSet<>();
 
-                for (Artifact artifact : allArtifacts) {
-                    noDuplicateAllArtifacts.add(artifact);
-                }
+              //  for (Artifact artifact : allArtifacts) {
+              //      noDuplicateAllArtifacts.add(artifact);
+              //  }
                 //convert set back to list for further processing
-                List<Artifact> noDuplicateAllDeps = new ArrayList(noDuplicateAllArtifacts);
+               // List<Artifact> noDuplicateAllDeps = new ArrayList(noDuplicateAllArtifacts);
 
                 request.setGoals(Collections.singletonList("dependency:analyze"));
+
                 ArrayList<String> unusedMavenDependencies = new ArrayList<>();
 
                 List<Artifact> unusedArtifacts = new ArrayList<>();
+
+                List<String> listOfModules = new ArrayList<>();
+
                 try {
 
                     invoker.setOutputHandler(new InvocationOutputHandler() {
@@ -105,6 +118,15 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                             if (line.startsWith("[WARNING] Used undeclared") || line.startsWith("[WARNING] Unused declared") || line.startsWith("[WARNING]    ")) {
                                 logger.info(line);
                                 unusedMavenDependencies.add(line);
+                            } else if (line.startsWith("[ERROR]")) {
+                                logger.info("The build failed for the project" + repositoryInformation.getName() + ". It will be excluded from the analysis");
+                                unusedMavenDependencies.add(line);
+                                return;
+                            }
+                            //for multi-module projects
+                            else if (line.startsWith("[INFO]") && line.endsWith("[jar]")) {
+                                logger.info(line);
+                                listOfModules.add(line);
                             }
                         }
                     });
@@ -113,33 +135,89 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                     e.printStackTrace();
                 }
 
+                for (String element : unusedMavenDependencies) {
+                    if (element.startsWith("[ERROR")) {
+                        //when all repositories have been analyzed, the log will display the amount of projects that have been skipped
+                        // because of a build failure
+                        buildFailures++;
+                        return new AnalysisResultWithoutProcessing(repositoryInformation, getUniqueName());
+                    }
+                }
+
+                //check if project is multi module
+                Model model = null;
+                FileReader r = null;
+                MavenXpp3Reader mavenreader = new MavenXpp3Reader();
+                try {
+
+                    r = new FileReader(pomFile);
+                    model = mavenreader.read(r);
+                    model.setPomFile(pomFile);
+
+                } catch (Exception ex) {
+                    System.out.println(ex);
+                }
+
+
+                boolean isMultiModule = false;
+                List<Artifact> transformModuletoArtifact = new ArrayList<>();
+                MavenProject project = new MavenProject(model);
+
+                if (!project.getModel().getModules().isEmpty()) {
+                    multiModule++;
+                    multiModuleProjects.add(repositoryInformation.getName());
+                    isMultiModule = true;
+
+
+                    String stringOfAllModules = String.join(", ", listOfModules);
+
+
+                    String abc[] = StringUtils.substringsBetween(stringOfAllModules, "[INFO]", "[jar]");
+                    for (int i = 0; i < abc.length; i++) {
+                        abc[i] = abc[i].trim();
+                    }
+
+                    List<String> moduleList = Arrays.asList(abc);
+                    for(int i =0; i < moduleList.size();i++){
+                        transformModuletoArtifact.add(i,new DefaultArtifact("org.dummy", moduleList.get(i), "", null,"jar", null, new DefaultArtifactHandler()));
+                    }
+
+                }
+
                 String mavenText = "[WARNING] Unused declared dependencies found:";
                 boolean unusedPattern = false;
+                int moduleCounter = 0;
                 // check if repo has unused dependencies
                 if (unusedMavenDependencies.contains(mavenText)) {
                     for (int i = getUnusedDependencyIndex(unusedMavenDependencies, mavenText); i < unusedMavenDependencies.size(); i++) {
                         if (unusedMavenDependencies.get(i).contains("[WARNING] Unused declared dependencies found:")) {
                             unusedPattern = true;
+                            if (!project.getModel().getModules().isEmpty()) {
+                                unusedArtifacts.add(transformModuletoArtifact.get(moduleCounter));
+                                moduleCounter++;
+                            }
                         }
                         if (unusedMavenDependencies.get(i).contains("[WARNING] Used undeclared dependencies found:")) {
                             unusedPattern = false;
                         }
                         if (unusedPattern && !unusedMavenDependencies.get(i).contains("[WARNING] Unused declared dependencies found:")) {
-                            unusedArtifacts.add(buildArtifactFromString(unusedMavenDependencies, i));
+
+                            unusedArtifacts.add(buildArtifactFromString(unusedMavenDependencies,i));
+
                         }
                     }
                 }
 
                 //get rid of duplicated unused Dependencies
-                Set<Artifact> noDuplicateUnusedArtifacts = new LinkedHashSet<>();
+                //    Set<Artifact> noDuplicateUnusedArtifacts = new LinkedHashSet<>();
 
-                for (Artifact artifact : unusedArtifacts) {
-                    noDuplicateUnusedArtifacts.add(artifact);
-                }
+                //   for (Artifact artifact : unusedArtifacts) {
+                //       noDuplicateUnusedArtifacts.add(artifact);
+                //   }
                 //convert set back to list for further processing
-                List<Artifact> noDuplicateUnusedDeps = new ArrayList(noDuplicateUnusedArtifacts);
-                logger.info("Liste ohne Duplikate: " + noDuplicateUnusedDeps);
-                return new MavenDependencyAnalysisResult(repositoryInformation, getUniqueName(), noDuplicateAllDeps, noDuplicateUnusedDeps);
+                //    List<Artifact> noDuplicateUnusedDeps = new ArrayList(noDuplicateUnusedArtifacts);
+                //    logger.info("Liste ohne Duplikate: " + noDuplicateUnusedDeps);
+                return new MavenDependencyAnalysisResult(repositoryInformation, getUniqueName(), allArtifacts, unusedArtifacts,isMultiModule);
 
             case JAVA_SCRIPT:
                 File packageJSONFile = new File(repositoryInformation.getLocalDownloadPath() + JSON_FILE);
@@ -246,7 +324,7 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
 
                 logger.info("Alle Dependencies:" + nodeDependencies);
                 logger.info("Unused Dependencies:" + unusedNodeDependencies);
-                return new NodeDependencyAnalysisResult(repositoryInformation, getUniqueName(), nodeDependencies, unusedNodeDependencies);
+                return new NodeDependencyAnalysisResult(repositoryInformation, getUniqueName(), nodeDependencies, unusedNodeDependencies,false);
         }
 
         logger.error("This part should never been reached");
@@ -302,6 +380,14 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
 
     public static int getBuildFailures() {
         return buildFailures;
+    }
+
+    public static int getMultiModule() {
+        return multiModule;
+    }
+
+    public static List<String> getMultiModuleProjects() {
+        return multiModuleProjects;
     }
 
 

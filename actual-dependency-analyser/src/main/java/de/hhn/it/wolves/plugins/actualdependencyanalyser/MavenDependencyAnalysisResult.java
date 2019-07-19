@@ -10,12 +10,14 @@ public class MavenDependencyAnalysisResult extends AnalysisResult {
 
     private final List<Artifact> allMavenDependencies;
     private final List<Artifact> unusedMavenDependencies;
+    private final boolean isMultiModule;
 
 
-    public MavenDependencyAnalysisResult(RepositoryInformation repositoryInformation, String analysisPluginname, List<Artifact> allMavenDependencies, List<Artifact> unusedMavenDependencies) {
+    public MavenDependencyAnalysisResult(RepositoryInformation repositoryInformation, String analysisPluginname, List<Artifact> allMavenDependencies, List<Artifact> unusedMavenDependencies, boolean isMultiModule) {
         super(repositoryInformation, analysisPluginname);
         this.allMavenDependencies = allMavenDependencies;
         this.unusedMavenDependencies = unusedMavenDependencies;
+        this.isMultiModule = isMultiModule;
     }
 
     public List<Artifact> getAllMavenDependencies() {
@@ -25,5 +27,9 @@ public class MavenDependencyAnalysisResult extends AnalysisResult {
 
     public List<Artifact> getUnusedMavenDependencies() {
         return unusedMavenDependencies;
+    }
+
+    public boolean isMultiModule() {
+        return isMultiModule;
     }
 }

@@ -16,11 +16,13 @@ public class MavenDependencyStatisticInformation extends StatisticInformation {
 
     private final List<Artifact> allForwardedMavenDependencies ;
     private final List<Artifact> unusedForwardedMavenDependencies ;
+    private final boolean isMultiModule;
 
-    public MavenDependencyStatisticInformation(AnalysisResult analysisResult, String processedPluginName, List<Artifact> allForwardedMavenDependencies,List<Artifact> unusedForwardedMavenDependencies) {
+    public MavenDependencyStatisticInformation(AnalysisResult analysisResult, String processedPluginName, List<Artifact> allForwardedMavenDependencies,List<Artifact> unusedForwardedMavenDependencies, boolean isMultiModule) {
         super(analysisResult, processedPluginName);
         this.allForwardedMavenDependencies = allForwardedMavenDependencies;
         this.unusedForwardedMavenDependencies = unusedForwardedMavenDependencies;
+        this.isMultiModule = isMultiModule;
     }
     public List<Artifact> getAllForwardedMavenDependencies() {
         return allForwardedMavenDependencies;
@@ -28,5 +30,9 @@ public class MavenDependencyStatisticInformation extends StatisticInformation {
 
     public List<Artifact> getUnusedForwardedMavenDependencies() {
         return unusedForwardedMavenDependencies;
+    }
+
+    public boolean isMultiModule() {
+        return isMultiModule;
     }
 }

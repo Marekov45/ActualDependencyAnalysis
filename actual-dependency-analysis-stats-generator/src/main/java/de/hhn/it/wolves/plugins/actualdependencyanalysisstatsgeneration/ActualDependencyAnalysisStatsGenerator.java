@@ -13,9 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 public class ActualDependencyAnalysisStatsGenerator implements StatisticGeneratorPlugin {
 
@@ -30,24 +28,61 @@ public class ActualDependencyAnalysisStatsGenerator implements StatisticGenerato
     @Override
     public GeneratedStatisticInformation generateStatistic(File file, String s, StatisticInformation statisticInformation) {
         String seperator = ";";
+       // Set<Artifact> noDuplicateAllArtifacts = new LinkedHashSet<>();
+       // Set<Artifact> noDuplicateUnusedArtifacts = new LinkedHashSet<>();
         List<String> lines = new ArrayList<>();
-        lines.add("Dependency;Version;Unused");
+        lines.add("Dependency;Version;Module;Unused");
         boolean foundUnused = false;
         if ((statisticInformation instanceof MavenDependencyStatisticInformation)) {
+            if (!((MavenDependencyStatisticInformation) statisticInformation).isMultiModule()) {
 
-            for (Artifact artifact : ((MavenDependencyStatisticInformation) statisticInformation).getAllForwardedMavenDependencies()) {
-                StringBuilder sb = new StringBuilder(artifact.getArtifactId());
-                sb.append(seperator).append(artifact.getVersion());
-                // check if the repo has any unused dependencies
-                if (!((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().isEmpty()) {
-                    for (Artifact artifact2 : ((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies()) {
-                        if (artifact2.equals(artifact)) {
-                            sb.append(seperator).append("X");
+
+                for (Artifact artifact : ((MavenDependencyStatisticInformation) statisticInformation).getAllForwardedMavenDependencies()) {
+                    StringBuilder sb = new StringBuilder(artifact.getArtifactId());
+                    sb.append(seperator).append(artifact.getVersion());
+                    sb.append(seperator).append(" ");
+                    // check if the repo has any unused dependencies
+                    if (!((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().isEmpty()) {
+                        for (Artifact artifact2 : ((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies()) {
+                            if (artifact2.equals(artifact)) {
+                                sb.append(seperator).append("X");
+                            }
                         }
+                        foundUnused = true;
                     }
-                    foundUnused = true;
+                    lines.add(sb.toString());
                 }
-                lines.add(sb.toString());
+            } else if (((MavenDependencyStatisticInformation) statisticInformation).isMultiModule()) {
+                String appendix = "";
+                List<Artifact> test = new ArrayList<>();
+                for(int i=0; i < ((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().size();i++){
+                    test.add(((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().get(i));
+                }
+                for (Artifact artifact : ((MavenDependencyStatisticInformation) statisticInformation).getAllForwardedMavenDependencies()) {
+                    StringBuilder builder = new StringBuilder(artifact.getArtifactId());
+                    builder.append(seperator).append(artifact.getVersion());
+                    if (((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().isEmpty()) {
+                        builder.append(seperator).append(" ");
+                    } else {
+                        for (Artifact module : test) {
+                            if (module.getVersion().equals("") && !appendix.equals(module.getArtifactId())) {
+                                appendix = module.getArtifactId();
+                                // ((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().remove(module);
+                            } else {
+                                if (module.equals(artifact)) {
+                                    builder.append(seperator).append(appendix);
+                                    builder.append(seperator).append("X");
+                                    // is this bad practice?
+                                    test.remove(module);
+                                    break;
+                                }
+                            }
+                        }
+                        foundUnused = true;
+                    }
+                    lines.add(builder.toString());
+                }
+
             }
         } else if ((statisticInformation instanceof NodeDependencyStatisticInformation)) {
             for (String str : ((NodeDependencyStatisticInformation) statisticInformation).getAllForwardedNodeDependencies()) {
@@ -59,7 +94,7 @@ public class ActualDependencyAnalysisStatsGenerator implements StatisticGenerato
                 sb.append(dependency);
                 sb.append(seperator).append(version);
                 //die if Anweisung funktioniert nicht, da alle Projekte falsch im Ordner hinterlegt werden, einmal als projektname.csv und dann noch als [UNUSED] projektname.csv
-                if (((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies().isEmpty() == false && ((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies().get(0).equals("No depcheck issue")==false) {
+                if (((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies().isEmpty() == false && ((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies().get(0).equals("No depcheck issue") == false) {
                     for (String str2 : ((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies()) {
                         if (!str2.contains("*")) {
                             logger.info("Angeblich unused : " + str2);
@@ -95,6 +130,8 @@ public class ActualDependencyAnalysisStatsGenerator implements StatisticGenerato
             } else {
                 writer = new BufferedWriter(new FileWriter(file.getAbsolutePath() + "/" + s + ".csv"));
             }
+            //sort alphabetically for better overview
+            Collections.sort(lines.subList(1,lines.size()));
             for (String string : lines) {
                 writer.write(string);
                 writer.newLine();

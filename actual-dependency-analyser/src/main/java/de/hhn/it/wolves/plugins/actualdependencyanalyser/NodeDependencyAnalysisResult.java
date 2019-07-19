@@ -10,12 +10,14 @@ public class NodeDependencyAnalysisResult extends AnalysisResult {
 
     private final List<String> allNodeDependencies;
     private final List<String> unusedNodeDependencies;
+    private boolean isMultiModule;
 
 
-    public NodeDependencyAnalysisResult(RepositoryInformation repositoryInformation, String analysisPluginname, List<String> allNodeDependencies, List<String> unusedNodeDependencies) {
+    public NodeDependencyAnalysisResult(RepositoryInformation repositoryInformation, String analysisPluginname, List<String> allNodeDependencies, List<String> unusedNodeDependencies,boolean isMultiModule) {
         super(repositoryInformation, analysisPluginname);
         this.allNodeDependencies = allNodeDependencies;
         this.unusedNodeDependencies = unusedNodeDependencies;
+        this.isMultiModule = isMultiModule;
     }
 
     public List<String> getAllNodeDependencies() {
@@ -24,5 +26,9 @@ public class NodeDependencyAnalysisResult extends AnalysisResult {
 
     public List<String> getUnusedNodeDependencies() {
         return unusedNodeDependencies;
+    }
+
+    public boolean isMultiModule() {
+        return isMultiModule;
     }
 }
