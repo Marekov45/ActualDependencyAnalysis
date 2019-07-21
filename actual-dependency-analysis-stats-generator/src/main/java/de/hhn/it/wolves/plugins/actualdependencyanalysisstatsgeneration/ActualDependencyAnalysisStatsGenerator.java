@@ -97,7 +97,7 @@ public class ActualDependencyAnalysisStatsGenerator implements StatisticGenerato
             }
         } else if ((statisticInformation instanceof NodeDependencyStatisticInformation)) {
             for (String str : ((NodeDependencyStatisticInformation) statisticInformation).getAllForwardedNodeDependencies()) {
-                String allSplitValues[] = str.split("@");
+                String[] allSplitValues = str.split("@");
                 logger.info("Following line incoming " + str);
                 String dependency = allSplitValues[0];
                 String version = allSplitValues[1];
@@ -105,7 +105,7 @@ public class ActualDependencyAnalysisStatsGenerator implements StatisticGenerato
                 sb.append(dependency);
                 sb.append(seperator).append(version);
                 //die if Anweisung funktioniert nicht, da alle Projekte falsch im Ordner hinterlegt werden, einmal als projektname.csv und dann noch als [UNUSED] projektname.csv
-                if (((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies().isEmpty() == false && ((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies().get(0).equals("No depcheck issue") == false) {
+                if (!((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies().isEmpty() && !((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies().get(0).equals("No depcheck issue")) {
                     for (String str2 : ((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies()) {
                         if (!str2.contains("*")) {
                             logger.info("Angeblich unused : " + str2);
@@ -115,7 +115,7 @@ public class ActualDependencyAnalysisStatsGenerator implements StatisticGenerato
                             }
                         } else {
                             logger.info("Angeblich unused : " + str2);
-                            String unusedSplitValues[] = str2.split("\\s");
+                            String[] unusedSplitValues = str2.split("\\s");
                             if (unusedSplitValues[1].equals(dependency)) {
                                 logger.info("Übereinstimmung!");
                                 sb.append(seperator).append("X");

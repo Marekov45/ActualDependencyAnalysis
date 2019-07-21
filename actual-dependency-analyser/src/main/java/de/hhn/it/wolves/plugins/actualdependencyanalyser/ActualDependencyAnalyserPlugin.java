@@ -11,6 +11,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.invoker.*;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,11 +52,28 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                 logger.info("Starting Maven process for " + pomFile.getAbsolutePath());
                 request.setPomFile(pomFile);
 
+                Model model = null;
+                FileReader r = null;
+                MavenXpp3Reader mavenreader = new MavenXpp3Reader();
+                try {
 
+                    r = new FileReader(pomFile);
+                    model = mavenreader.read(r);
+                    model.setPomFile(pomFile);
+
+                } catch (XmlPullParserException | IOException e) {
+                    logger.error("We could not read the pom.xml for the current project! It will be excluded from the analysis.", e);
+                    return new AnalysisResultWithoutProcessing(repositoryInformation, getUniqueName());
+                }
+
+
+                boolean isMultiModule = false;
+
+                MavenProject project = new MavenProject(model);
                 Invoker invoker = new DefaultInvoker();
                 invoker.setMavenHome(new File("/usr/share/maven"));
 
-                request.setGoals(Collections.singletonList("dependency:list"));
+                request.setGoals(Collections.singletonList("-DexcludeTransitive=true dependency:list"));
 
 
                 ArrayList<String> allMavenDependencies = new ArrayList<>();
@@ -69,16 +87,22 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                             if (line.startsWith("[INFO]    ") && !line.equals("[INFO]    none")) {
 
                                 allMavenDependencies.add(line);
+                            } else if (line.contains("[ pom ]") || line.contains("[ jar ]")) { //needed to identify parent pom
+                                if (!project.getModel().getModules().isEmpty()) {
+                                    line = StringUtils.remove(line, '-');
+                                    allMavenDependencies.add(line);
+                                }
                             } else if (line.startsWith("[ERROR]")) {
                                 logger.info("The build failed for the project" + repositoryInformation.getName() + ". It will be excluded from the analysis");
                                 allMavenDependencies.add(line);
-                                return;
                             }
                         }
                     });
                     invoker.execute(request);
                 } catch (MavenInvocationException e) {
-                    e.printStackTrace();
+                    logger.error("We got an error during the construction of the command line used to invoke Maven! The information" +
+                            "for this repository will not be processed any further!", e);
+                    return new AnalysisResultWithoutProcessing(repositoryInformation, getUniqueName());
                 }
                 //check if list contains an error, if thats the case, remove project from analysis
                 for (String element : allMavenDependencies) {
@@ -90,45 +114,35 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                     }
                 }
 
+                //parent poms will be skipped
+                if (!project.getModel().getModules().isEmpty()) {
+                    for (int i = 0; i < allMavenDependencies.size(); i++) {
+                        if (allMavenDependencies.get(i).contains("[ jar ]")) {
+                            allMavenDependencies.subList(0, i).clear();
+                            break;
+                        }
+                    }
+                    for (int j = allMavenDependencies.size() - 1; j >= 0; j--) {
+                        if (allMavenDependencies.get(j).equals("[INFO] [ jar ]") || allMavenDependencies.get(j).equals("[INFO] [ pom ]")) {
+                            allMavenDependencies.remove(j);
+                        }
+                    }
+                }
+
                 for (int i = 0; i < allMavenDependencies.size(); i++) {
                     allArtifacts.add(buildArtifactFromString(allMavenDependencies, i));
                 }
 
-                //get rid of duplicated Dependencies
-                // Set<Artifact> noDuplicateAllArtifacts = new LinkedHashSet<>();
 
-                //  for (Artifact artifact : allArtifacts) {
-                //      noDuplicateAllArtifacts.add(artifact);
-                //  }
-                //convert set back to list for further processing
-                // List<Artifact> noDuplicateAllDeps = new ArrayList(noDuplicateAllArtifacts);
-
-                request.setGoals(Collections.singletonList("dependency:analyze"));
+                //only bytecode analysis, cant detect runtime,test,provided dependencies etc. ignore everything non compile
+                request.setGoals(Collections.singletonList(" -DignoreNonCompile=true dependency:analyze"));
 
                 ArrayList<String> unusedMavenDependencies = new ArrayList<>();
 
                 List<Artifact> unusedArtifacts = new ArrayList<>();
 
-                List<String> listOfModules = new ArrayList<>();
+                List<String> commandLineInfos = new ArrayList<>();
 
-
-                Model model = null;
-                FileReader r = null;
-                MavenXpp3Reader mavenreader = new MavenXpp3Reader();
-                try {
-
-                    r = new FileReader(pomFile);
-                    model = mavenreader.read(r);
-                    model.setPomFile(pomFile);
-
-                } catch (Exception ex) {
-                    System.out.println(ex);
-                }
-
-
-                boolean isMultiModule = false;
-
-                MavenProject project = new MavenProject(model);
 
                 try {
 
@@ -138,8 +152,12 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                             if (line.startsWith("[WARNING] Used undeclared") || line.startsWith("[WARNING] Unused declared")) {
                                 logger.info(line);
                                 unusedMavenDependencies.add(line);
-                                listOfModules.add(line);
-                            } else if (line.startsWith("[WARNING]    ")) {
+                                commandLineInfos.add(line);
+                                //spring boot only autoconfigures different things  by adding the corresponding dependency
+                                // and this configuration is happening outside of the application code, thus everything related
+                                //to springframework will be ignored,
+                                //for more see https://stackoverflow.com/questions/37528928/spring-boot-core-dependencies-seen-as-unused-by-maven-dependency-plugin
+                            } else if (line.startsWith("[WARNING]    ") && !line.contains("org.springframework")) {
                                 unusedMavenDependencies.add(line);
                             } else if (line.startsWith("[ERROR]")) {
                                 logger.info("The build failed for the project" + repositoryInformation.getName() + ". It will be excluded from the analysis");
@@ -150,7 +168,7 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                             else if (!project.getModel().getModules().isEmpty()) {
                                 if (line.contains("[INFO] No dependency problems found") || line.startsWith("[INFO] --- maven-dependency-plugin:") || line.contains("[INFO] Skipping pom project")) {
                                     logger.info(line);
-                                    listOfModules.add(line);
+                                    commandLineInfos.add(line);
                                 }
 
                             }
@@ -158,7 +176,9 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                     });
                     invoker.execute(request);
                 } catch (MavenInvocationException e) {
-                    e.printStackTrace();
+                    logger.error("We got an error during the construction of the command line used to invoke Maven! The information" +
+                            "for this repository will not be processed any further!", e);
+                    return new AnalysisResultWithoutProcessing(repositoryInformation, getUniqueName());
                 }
 
                 for (String element : unusedMavenDependencies) {
@@ -176,22 +196,24 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                     multiModuleProjects.add(repositoryInformation.getName());
                     isMultiModule = true;
                     List<String> completeList = new ArrayList<>();
-                    for (int i = 0; i < listOfModules.size(); i++) {
-                        if (listOfModules.get(i).contains("@")) {
-                            String t = StringUtils.substringBetween(listOfModules.get(i), "@", "---").trim();
+                    for (String commandLineInfo : commandLineInfos) {
+                        if (commandLineInfo.contains("@")) {
+                            String t = StringUtils.substringBetween(commandLineInfo, "@", "---").trim();
                             completeList.add(t);
-                        } else if (listOfModules.get(i).contains("No dependency problems")) {
-                            String u = StringUtils.substringBetween(listOfModules.get(i), "[INFO]", "found");
+                        } else if (commandLineInfo.contains("No dependency problems")) {
+                            String u = StringUtils.substringBetween(commandLineInfo, "[INFO]", "found");
                             completeList.add(u);
-                        } else if (listOfModules.get(i).contains("Skipping pom project")) {
-                            String u = StringUtils.substringBetween(listOfModules.get(i), "[INFO]", "project");
+                        } else if (commandLineInfo.contains("Skipping pom project")) {
+                            String u = StringUtils.substringBetween(commandLineInfo, "[INFO]", "project");
                             completeList.add(u);
-                        } else if (listOfModules.get(i).contains("[WARNING]")) {
-                            String u = StringUtils.substringBetween(listOfModules.get(i), "[WARNING]", "dependencies");
+                        } else if (commandLineInfo.contains("[WARNING]")) {
+                            String u = StringUtils.substringBetween(commandLineInfo, "[WARNING]", "dependencies");
                             completeList.add(u);
                         }
                     }
 
+                    // removes every module from the current multi-module project that has no dependency problems, is packaged as a pom or
+                    // only has used undeclared dependencies
                     for (int i = completeList.size() - 1; i >= 0; ) {
                         if (completeList.get(i).contains("No dependency problems") || completeList.get(i).contains("Skipping pom")) {
                             completeList.remove(i);
@@ -214,7 +236,7 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                         }
                     }
 
-
+                    // transforms every module from current multi-module project into an Artifact for easier processing
                     for (int i = 0; i < completeList.size(); i++) {
                         transformModuletoArtifact.add(i, new DefaultArtifact("org.dummy", completeList.get(i), "No version", null, "jar", null, new DefaultArtifactHandler()));
                     }
@@ -267,19 +289,22 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                 ProcessBuilder pb = new ProcessBuilder("/bin/bash", "-c", "npm list -dev -prod -depth 0");
                 pb.directory(repositoryInformation.getLocalDownloadPath());
                 pb.redirectErrorStream(true);
-                Process p3 = null;
+                Process process = null;
                 try {
-                    p3 = pb.start();
+                    process = pb.start();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error("We could not start the current process! Either the command is not a valid system operating command or" +
+                            "the working directory does not exist.", e);
+                    return new AnalysisResultWithoutProcessing(repositoryInformation, getUniqueName());
                 }
-                BufferedReader input = new BufferedReader((new InputStreamReader(p3.getInputStream())));
+                BufferedReader input = new BufferedReader((new InputStreamReader(process.getInputStream())));
                 ArrayList<String> allNodeDependencies = new ArrayList<>();
                 String line = null;
                 try {
                     input.readLine();  // read first line so analysis starts at line 2
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error("We could not read the input from the current process! The project will not be analysed.", e);
+                    return new AnalysisResultWithoutProcessing(repositoryInformation, getUniqueName());
                 }
                 while (true) {
                     try {
@@ -293,29 +318,33 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                             allNodeDependencies.add(line);
                         }
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        logger.error("We could not read the input from the current process! The project will not be analysed.", e);
+                        return new AnalysisResultWithoutProcessing(repositoryInformation, getUniqueName());
                     }
 
                 }
                 ArrayList<String> nodeDependencies = new ArrayList<>();
+                int index = 0;
                 //ACHTUNG HIER AUF REMOVE REIHENFOLGE ACHTEN
                 for (int i = allNodeDependencies.size() - 1; i >= 0; i--) {
                     nodeDependencies.add(getNameOfDependency(allNodeDependencies, i));
-                    if (nodeDependencies.get(i).startsWith("@")) {
-                        String s = nodeDependencies.get(i).substring(1);
-                        nodeDependencies.remove(i);
+                    if (nodeDependencies.get(index).startsWith("@")) {
+                        String s = nodeDependencies.get(index).substring(1);
+                        nodeDependencies.remove(index);
                         nodeDependencies.add(s);
                     }
+                    index++;
                 }
                 //the command for getting all unused dependencies
                 pb.command("depcheck");
-                Process p2 = null;
+                Process depcheckProcess = null;
                 try {
-                    p2 = pb.start();
+                    depcheckProcess = pb.start();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error("We could not start the current process! The command is most likely not a valid system operating command.", e);
+                    return new AnalysisResultWithoutProcessing(repositoryInformation, getUniqueName());
                 }
-                BufferedReader reader = new BufferedReader(new InputStreamReader(p2.getInputStream()));
+                BufferedReader reader = new BufferedReader(new InputStreamReader(depcheckProcess.getInputStream()));
 
                 String row = null;
                 ArrayList<String> depcheckDependencies = new ArrayList<>();
@@ -325,29 +354,34 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                         if (!((row = reader.readLine()) != null)) break;
                         logger.info(row);
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        logger.error("We could not read the input from the current process! The project will not be analysed.", e);
+                        return new AnalysisResultWithoutProcessing(repositoryInformation, getUniqueName());
                     }
                     depcheckDependencies.add(row);
                 }
                 ArrayList<String> unusedNodeDependencies = new ArrayList<>();
                 String depcheckText = "Missing dependencies";
                 if (depcheckDependencies.contains(depcheckText)) {
-                    for (int i = 0; i < getUnusedDependencyIndex(depcheckDependencies, depcheckText); i++) {
+                    int unusedindex = 0;
+                    for (int i = getUnusedDependencyIndex(depcheckDependencies, depcheckText) - 1; i >= 0; i--) {
                         unusedNodeDependencies.add(depcheckDependencies.get(i));
-                        if (unusedNodeDependencies.get(i).startsWith("* @")) {
-                            String s = unusedNodeDependencies.get(i).substring(3);
-                            unusedNodeDependencies.remove(i);
+                        if (unusedNodeDependencies.get(unusedindex).startsWith("* @")) {
+                            String s = unusedNodeDependencies.get(unusedindex).substring(3);
+                            unusedNodeDependencies.remove(unusedindex);
                             unusedNodeDependencies.add(s);
                         }
+                        unusedindex++;
                     }
                 } else {
-                    for (int j = 0; j < depcheckDependencies.size(); j++) {
+                    int unusedIndexNoMissingDeps = 0;
+                    for (int j = depcheckDependencies.size() - 1; j >= 0; j--) {
                         unusedNodeDependencies.add(depcheckDependencies.get(j));
-                        if (unusedNodeDependencies.get(j).startsWith("* @")) {
-                            String s = unusedNodeDependencies.get(j).substring(3);
-                            unusedNodeDependencies.remove(j);
+                        if (unusedNodeDependencies.get(unusedIndexNoMissingDeps).startsWith("* @")) {
+                            String s = unusedNodeDependencies.get(unusedIndexNoMissingDeps).substring(3);
+                            unusedNodeDependencies.remove(unusedIndexNoMissingDeps);
                             unusedNodeDependencies.add(s);
                         }
+                        unusedIndexNoMissingDeps++;
                     }
                 }
                 //remove Error messages in List
@@ -373,7 +407,7 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
     private String getNameOfDependency(ArrayList<String> allDependencies, int i) {
         String dependency;
         String line = allDependencies.get(i);
-        String splitValues[] = line.split("\\s");
+        String[] splitValues = line.split("\\s");
         if (line.contains("OPTIONAL") || line.contains("PEER")) {
             return dependency = splitValues[4];
         }
@@ -391,11 +425,10 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
 
 
     private int getUnusedDependencyIndex(ArrayList<String> output, String startingPoint) {
-        String text = startingPoint;
         int index = 0;
         int counter = 0;
         for (String start : output) {
-            if (start.equals(text)) {
+            if (start.equals(startingPoint)) {
                 index = counter;
                 break;
             }
@@ -406,14 +439,13 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
 
     private Artifact buildArtifactFromString(ArrayList<String> pluginOutput, int unusedDependencyIndex) {
         String line = pluginOutput.get(unusedDependencyIndex);
-        String splitValues[] = line.split(":|\\s+");
+        String[] splitValues = line.split(":|\\s+");
         String groupId = splitValues[1];
         String artifactId = splitValues[2];// ganz selten out of bounds?
         String type = splitValues[3];
         String version = splitValues[4];
         String scope = splitValues[5];
-        Artifact artifact = new DefaultArtifact(groupId, artifactId, version, scope, type, null, new DefaultArtifactHandler());
-        return artifact;
+        return new DefaultArtifact(groupId, artifactId, version, scope, type, null, new DefaultArtifactHandler());
 
     }
 
