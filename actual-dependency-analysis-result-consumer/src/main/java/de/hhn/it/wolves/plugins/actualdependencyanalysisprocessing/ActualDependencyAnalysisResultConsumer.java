@@ -7,6 +7,11 @@ import de.hhn.it.wolves.plugins.actualdependencyanalyser.NodeDependencyAnalysisR
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Created by Marvin Rekovsky on 04.07.19.
+ *
+ * Forwards the {@link AnalysisResult} to the correspondent statistic generator plugin.
+ */
 public class ActualDependencyAnalysisResultConsumer implements AnalysisResultConsumerPlugin {
 
     private static final String PLUGIN_NAME = "Actual dependency analysis RC";

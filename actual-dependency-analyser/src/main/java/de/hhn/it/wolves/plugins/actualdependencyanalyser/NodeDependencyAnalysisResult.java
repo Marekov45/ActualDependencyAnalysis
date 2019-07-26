@@ -6,6 +6,13 @@ import org.apache.maven.artifact.Artifact;
 
 import java.util.List;
 
+/**
+ * Created by Marvin Rekovsky on 21.06.19.
+ *
+ * This class represents the implementation of an {@link AnalysisResult} for the framework. It holds the
+ * information of all JavaScript dependencies and unused declared dependencies in a JavaScript project
+ * analysed by the {@link ActualDependencyAnalyserPlugin}.
+ */
 public class NodeDependencyAnalysisResult extends AnalysisResult {
 
     private final List<String> allNodeDependencies;

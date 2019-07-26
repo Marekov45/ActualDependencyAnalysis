@@ -7,37 +7,32 @@ import de.hhn.it.wolves.domain.StatisticInformation;
 import de.hhn.it.wolves.plugins.actualdependencyanalyser.ActualDependencyAnalyserPlugin;
 import de.hhn.it.wolves.plugins.actualdependencyanalysisprocessing.MavenDependencyStatisticInformation;
 import de.hhn.it.wolves.plugins.actualdependencyanalysisprocessing.NodeDependencyStatisticInformation;
-import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.Artifact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.net.URL;
 import java.util.*;
 
+/**
+ * Created by Marvin Rekovsky on 04.07.19.
+ * <p>
+ * This plugin generates the statistics for each single repository regarding the use of unused declared dependencies.
+ */
 public class ActualDependencyAnalysisStatsGenerator implements StatisticGeneratorPlugin {
 
     private static final String PLUGIN_NAME = "Actual dependency statistic generator";
     private static final Logger logger = LoggerFactory.getLogger(ActualDependencyAnalysisStatsGenerator.class.getName());
-    private static final String CONFIG_FILE_NAME = "/actualdependency.properties";
-    private File workingDirectory;
 
-    private FrameworkManager frameworkManager;
-    private Properties properties;
 
     @Override
     public GeneratedStatisticInformation generateStatistic(File file, String s, StatisticInformation statisticInformation) {
         String seperator = ";";
-        // Set<Artifact> noDuplicateAllArtifacts = new LinkedHashSet<>();
-        // Set<Artifact> noDuplicateUnusedArtifacts = new LinkedHashSet<>();
         List<String> lines = new ArrayList<>();
         lines.add("Dependency;Version;Module;Unused");
         boolean foundUnused = false;
         if ((statisticInformation instanceof MavenDependencyStatisticInformation)) {
             if (!((MavenDependencyStatisticInformation) statisticInformation).isMultiModule()) {
-
-
                 for (Artifact artifact : ((MavenDependencyStatisticInformation) statisticInformation).getAllForwardedMavenDependencies()) {
                     StringBuilder sb = new StringBuilder(artifact.getArtifactId());
                     sb.append(seperator).append(artifact.getVersion());
@@ -66,16 +61,15 @@ public class ActualDependencyAnalysisStatsGenerator implements StatisticGenerato
                     if (((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().isEmpty()) {
                         builder.append(seperator).append(" ");
                     } else {
+                        //this part checks in which module the unused declared dependency is used in a multi-module project
                         for (Iterator<Artifact> iterator = unusedDepsCopy.iterator(); iterator.hasNext(); ) {
                             Artifact module = iterator.next();
                             if (module.getVersion().equals("No version") && !moduleName.equals(module.getArtifactId())) {
                                 moduleName = module.getArtifactId();
-                                // ((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().remove(module);
                             } else {
                                 if (module.equals(artifact)) {
                                     builder.append(seperator).append(moduleName);
                                     builder.append(seperator).append("X");
-                                    // is this bad practice?
                                     iterator.remove();
                                     break;
                                 }
@@ -87,13 +81,13 @@ public class ActualDependencyAnalysisStatsGenerator implements StatisticGenerato
                 }
                 //get rid of modules in unused dependencies list to have correct global stats
                 for (int i = 0; i < ActualDependencyAnalyserPlugin.getTransformedModules().size(); i++) {
-                    for (int j = ((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().size()-1; j >= 0; j--) {
+                    for (int j = ((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().size() - 1; j >= 0; j--) {
                         if (((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().get(j).equals(ActualDependencyAnalyserPlugin.getTransformedModules().get(i))) {
                             ((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().remove(j);
                         }
                     }
                 }
-                logger.info("list mit unused Dependencies: " + ((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies());
+                logger.info("List of all unused Dependencies: " + ((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies());
             }
         } else if ((statisticInformation instanceof NodeDependencyStatisticInformation)) {
             for (String str : ((NodeDependencyStatisticInformation) statisticInformation).getAllForwardedNodeDependencies()) {
@@ -104,20 +98,21 @@ public class ActualDependencyAnalysisStatsGenerator implements StatisticGenerato
                 StringBuilder sb = new StringBuilder();
                 sb.append(dependency);
                 sb.append(seperator).append(version);
-                //die if Anweisung funktioniert nicht, da alle Projekte falsch im Ordner hinterlegt werden, einmal als projektname.csv und dann noch als [UNUSED] projektname.csv
                 if (!((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies().isEmpty() && !((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies().get(0).equals("No depcheck issue")) {
-                    for (String str2 : ((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies()) {
-                        if (!str2.contains("*")) {
-                            logger.info("Angeblich unused : " + str2);
-                            if (str2.equals(dependency)) {
-                                logger.info("Übereinstimmung!");
+                    for (String unusedDependency : ((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies()) {
+                        //dependencies that used an '@' infront of their name, had their * removed beforehand
+                        if (!unusedDependency.contains("*")) {
+                            logger.info("Apparently unused : " + unusedDependency);
+                            if (unusedDependency.equals(dependency)) {
+                                logger.info("Dependencies match! " + unusedDependency + " is unused");
                                 sb.append(seperator).append("X");
                             }
                         } else {
-                            logger.info("Angeblich unused : " + str2);
-                            String[] unusedSplitValues = str2.split("\\s");
+                            //dependencies still have a '*' infront of their name and need to be split
+                            logger.info("Apparently unused : " + unusedDependency);
+                            String[] unusedSplitValues = unusedDependency.split("\\s");
                             if (unusedSplitValues[1].equals(dependency)) {
-                                logger.info("Übereinstimmung!");
+                                logger.info("Dependencies match! " + unusedSplitValues[1] + " is unused");
                                 sb.append(seperator).append("X");
                             }
                         }
@@ -134,8 +129,6 @@ public class ActualDependencyAnalysisStatsGenerator implements StatisticGenerato
         }
         BufferedWriter writer = null;
         try {
-            //unterscheidung maven und nodejs
-
             if (foundUnused) {
                 writer = new BufferedWriter(new FileWriter(file.getAbsolutePath() + "/[UNUSED] " + s + ".csv"));
             } else {

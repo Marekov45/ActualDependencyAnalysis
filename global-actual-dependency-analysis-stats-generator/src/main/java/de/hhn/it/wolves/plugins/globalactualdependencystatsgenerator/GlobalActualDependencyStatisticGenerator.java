@@ -9,26 +9,27 @@ import org.apache.maven.artifact.Artifact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * Created by Marvin Rekovsky on 07.07.19.
+ * <p>
+ * This plugin gathers data about all repositories regarding the use of unused declared dependencies. At the end it generates
+ * a global statistic over all the analysed repositories.
+ */
 public class GlobalActualDependencyStatisticGenerator implements TwoPhasesStatisticGeneratorPlugin {
 
     private static final String PLUGIN_NAME = "Global actual dependency statistic generator";
     private static final Logger logger = LoggerFactory.getLogger(GlobalActualDependencyStatisticGenerator.class.getName());
-
     private final Set<Repo> repositories = new HashSet<>();
-    //  private final Set<NodeEntry> depcheckDependencies = new HashSet<>();
     private int unusedDeps;
     private int noUnusedDeps;
 
 
-    //startet diese Phase erst wenn alle projekte abgearbeitet wurden?
-    //evtl noch überprüfen ob überhaupt unused dependencies vorhanden sind damit die schleife nicht umsonst durchlaufen wird
     @Override
     public void startOperationInPhaseTwo(File file) {
         String separator = ";";
@@ -47,16 +48,14 @@ public class GlobalActualDependencyStatisticGenerator implements TwoPhasesStatis
                 Set<Artifact> noDuplicateAllArtifacts = new LinkedHashSet<>(repository.getMavenDependencies());
                 // get rid of duplicated unused Dependencies only for global stats
                 Set<Artifact> noDuplicateUnusedArtifacts = new LinkedHashSet<>(repository.getUnusedMavenDependencies());
-
                 for (Artifact artifact : noDuplicateAllArtifacts) {
                     for (Artifact artifact1 : noDuplicateUnusedArtifacts) {
                         if (artifact1.equals(artifact)) {
-                            unusedDependencies += "\n-" + artifact1.getArtifactId(); //evtl. noch groupId etc. hinzufügen
+                            unusedDependencies += "\n-" + artifact1.getArtifactId();
                         }
                     }
                 }
             } else if (repository.getRepositoryInformation().getProgrammingLanguage().equals(ProgrammingLanguage.JAVA_SCRIPT)) {
-                // List<String> unusedDependencies = new ArrayList<>();
                 for (String str : repository.getDepcheckDependencies()) {
                     String[] allSplitValues = str.split("@");
                     String dependency = allSplitValues[0];
@@ -89,7 +88,6 @@ public class GlobalActualDependencyStatisticGenerator implements TwoPhasesStatis
 
                 // get rid of duplicated unused Dependencies only for global stats
                 Set<Artifact> noDuplicateUnusedArtifacts = new LinkedHashSet<>(repository.getUnusedMavenDependencies());
-                //change this to get duplicates or not
                 sb.append(separator).append(noDuplicateAllArtifacts.size());
                 if (repository.getUnusedMavenDependencies().size() != 0) {
                     unused = noDuplicateUnusedArtifacts.size();
@@ -121,7 +119,7 @@ public class GlobalActualDependencyStatisticGenerator implements TwoPhasesStatis
                 try {
                     writer.close();
                 } catch (IOException e) {
-                    logger.error("We could not close the buffered writer. Maybe data will be lost or not generated!");
+                    logger.error("We could not close the buffered writer. Maybe data will be lost or not generated!",e);
                 }
         }
     }
@@ -129,33 +127,32 @@ public class GlobalActualDependencyStatisticGenerator implements TwoPhasesStatis
     @Override
     public GeneratedStatisticInformation generateStatistic(File file, String s, StatisticInformation statisticInformation) {
         if ((statisticInformation instanceof MavenDependencyStatisticInformation)) {
-            repositories.add(new Repo(statisticInformation.getRepositoryInformation(), ((MavenDependencyStatisticInformation) statisticInformation).getAllForwardedMavenDependencies(), ((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies(), null, null,((MavenDependencyStatisticInformation) statisticInformation).isMultiModule()));
-            for (Artifact artifact : ((MavenDependencyStatisticInformation) statisticInformation).getAllForwardedMavenDependencies()) {
+            repositories.add(new Repo(statisticInformation.getRepositoryInformation(), ((MavenDependencyStatisticInformation) statisticInformation).getAllForwardedMavenDependencies(), ((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies(), null, null, ((MavenDependencyStatisticInformation) statisticInformation).isMultiModule()));
+            for (Artifact dependency : ((MavenDependencyStatisticInformation) statisticInformation).getAllForwardedMavenDependencies()) {
                 if (!((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().isEmpty()) {
-                    for (Artifact artifact2 : ((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies()) {
-                        if (artifact2.equals(artifact)) {
+                    for (Artifact unusedDependency : ((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies()) {
+                        //count projects with unused declared dependencies
+                        if (unusedDependency.equals(dependency)) {
                             unusedDeps++;
                             return new GeneratedStatisticInformation(statisticInformation, null, getUniqueName());
                         }
                     }
                 }
             }
-            // noUnusedDeps++;
-            // return new GeneratedStatisticInformation(statisticInformation, null, getUniqueName());
         } else if ((statisticInformation instanceof NodeDependencyStatisticInformation)) {
             repositories.add(new Repo(statisticInformation.getRepositoryInformation(), null, null, ((NodeDependencyStatisticInformation) statisticInformation).getAllForwardedNodeDependencies(), ((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies(), false));
             for (String str : ((NodeDependencyStatisticInformation) statisticInformation).getAllForwardedNodeDependencies()) {
                 String[] allSplitValues = str.split("@");
                 String dependency = allSplitValues[0];
                 if (!((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies().isEmpty() && !((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies().get(0).equals("No depcheck issue")) {
-                    for (String str2 : ((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies()) {
-                        if (!str2.contains("*")) {
-                            if (str2.equals(dependency)) {
+                    for (String unusedNodeDependency : ((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies()) {
+                        if (!unusedNodeDependency.contains("*")) {
+                            if (unusedNodeDependency.equals(dependency)) {
                                 unusedDeps++;
                                 return new GeneratedStatisticInformation(statisticInformation, null, getUniqueName());
                             }
                         } else {
-                            String[] unusedSplitValues = str2.split("\\s");
+                            String[] unusedSplitValues = unusedNodeDependency.split("\\s");
                             if (unusedSplitValues[1].equals(dependency)) {
                                 unusedDeps++;
                                 return new GeneratedStatisticInformation(statisticInformation, null, getUniqueName());
@@ -164,8 +161,6 @@ public class GlobalActualDependencyStatisticGenerator implements TwoPhasesStatis
                     }
                 }
             }
-            //  noUnusedDeps++;
-            //  return new GeneratedStatisticInformation(statisticInformation, null, getUniqueName());
         } else {
             logger.error("I got an statistic information that I am not designed for");
             return new GeneratedStatisticInformation(statisticInformation, null, getUniqueName());
@@ -194,6 +189,9 @@ public class GlobalActualDependencyStatisticGenerator implements TwoPhasesStatis
 
     }
 
+    /**
+     * This nested class represents a repository with all of its information including used and unused declared dependencies.
+     */
     private class Repo {
         private final RepositoryInformation repositoryInformation;
         private final List<Artifact> mavenDependencies;
@@ -235,22 +233,4 @@ public class GlobalActualDependencyStatisticGenerator implements TwoPhasesStatis
             return isMultiModule;
         }
     }
-
-    /** private class NodeEntry {
-     private final RepositoryInformation repositoryInformation;
-     private final List<String> dependencies;
-
-     public NodeEntry(RepositoryInformation repositoryInformation, List<String> dependencies) {
-     this.repositoryInformation = repositoryInformation;
-     this.dependencies = dependencies;
-     }
-
-     public RepositoryInformation getRepositoryInformation() {
-     return repositoryInformation;
-     }
-
-     public List<String> getDependencies() {
-     return dependencies;
-     }
-     } **/
 }

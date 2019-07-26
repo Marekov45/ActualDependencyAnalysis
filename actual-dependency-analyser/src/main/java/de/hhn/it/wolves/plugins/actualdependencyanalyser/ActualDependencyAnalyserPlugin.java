@@ -2,7 +2,6 @@ package de.hhn.it.wolves.plugins.actualdependencyanalyser;
 
 import de.hhn.it.wolves.components.AnalysisPlugin;
 import de.hhn.it.wolves.domain.*;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
@@ -16,25 +15,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.net.URL;
 import java.util.*;
 
+/**
+ * Created by Marvin Rekovsky on 11.06.19.
+ * <p>
+ * This plugin analyses the use of declared dependencies that are unused in a project.
+ */
 public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
 
     private static final String PLUGIN_NAME = "Actual dependency analyser";
     private static final Logger logger = LoggerFactory.getLogger(ActualDependencyAnalyserPlugin.class.getName());
     private static final String POM_FILE = "/pom.xml";
     private static final String JSON_FILE = "/package.json";
-    private static int buildFailures = 0;
-    private static int multiModule = 0;
-    private static List<String> multiModuleProjects = new ArrayList<>();
+    private static int buildFailures = 0; //counts build failures for global stats
+    private static int multiModule = 0; //counts multi module projects for global stats
+    private static List<String> multiModuleProjects = new ArrayList<>(); //list for all multi module projects to be displayed in global stats
     private static List<Artifact> transformModuletoArtifact = new ArrayList<>();
 
 
-    public void init(FrameworkManager frameworkManager) {
-
-    }
-
+    @Override
     public AnalysisResult analyseRepository(RepositoryInformation repositoryInformation) {
         switch (repositoryInformation.getProgrammingLanguage()) {
             case JAVA:
@@ -46,7 +46,7 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                 File pomFile = new File(repositoryInformation.getLocalDownloadPath() + POM_FILE);
 
                 if (!pomFile.exists()) {
-                    logger.info("We could not a find a pom file for" + repositoryInformation.getName() + ", thus it will be excluded from the analysis.");
+                    logger.error("We could not a find a pom file for" + repositoryInformation.getName() + ", thus it will be excluded from the analysis.");
                     return new AnalysisResultWithoutProcessing(repositoryInformation, getUniqueName());
                 }
                 logger.info("Starting Maven process for " + pomFile.getAbsolutePath());
@@ -66,13 +66,12 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                     return new AnalysisResultWithoutProcessing(repositoryInformation, getUniqueName());
                 }
 
-
                 boolean isMultiModule = false;
 
                 MavenProject project = new MavenProject(model);
                 Invoker invoker = new DefaultInvoker();
                 invoker.setMavenHome(new File("/usr/share/maven"));
-
+                //only list non transitive dependencies
                 request.setGoals(Collections.singletonList("-DexcludeTransitive=true dependency:list"));
 
 
@@ -83,11 +82,13 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                     invoker.setOutputHandler(new InvocationOutputHandler() {
                         @Override
                         public void consumeLine(String line) throws IOException {
-                            //  logger.info(line);
+                            //all maven dependencies have this substring at the start
                             if (line.startsWith("[INFO]    ") && !line.equals("[INFO]    none")) {
 
                                 allMavenDependencies.add(line);
-                            } else if (line.contains("[ pom ]") || line.contains("[ jar ]")) { //needed to identify parent pom
+                            }
+                            //for multi-module projects, substrings have to be included that identify the module
+                            else if (line.contains("[ pom ]") || line.contains("[ jar ]")) {
                                 if (!project.getModel().getModules().isEmpty()) {
                                     line = StringUtils.remove(line, '-');
                                     allMavenDependencies.add(line);
@@ -98,6 +99,7 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                             }
                         }
                     });
+                    //invoke maven goal from command line
                     invoker.execute(request);
                 } catch (MavenInvocationException e) {
                     logger.error("We got an error during the construction of the command line used to invoke Maven! The information" +
@@ -107,28 +109,28 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                 //check if list contains an error, if thats the case, remove project from analysis
                 for (String element : allMavenDependencies) {
                     if (element.startsWith("[ERROR")) {
-                        //when all repositories have been analyzed, the log will display the amount of projects that have been skipped
-                        // because of a build failure
                         buildFailures++;
                         return new AnalysisResultWithoutProcessing(repositoryInformation, getUniqueName());
                     }
                 }
 
-                //parent poms will be skipped
+                //parent poms will be skipped for multi-module projects
                 if (!project.getModel().getModules().isEmpty()) {
                     for (int i = 0; i < allMavenDependencies.size(); i++) {
                         if (allMavenDependencies.get(i).contains("[ jar ]")) {
                             allMavenDependencies.subList(0, i).clear();
-                            break;
+                            break; // after the initial parent pom is removed
                         }
                     }
                     for (int j = allMavenDependencies.size() - 1; j >= 0; j--) {
+                        //remove every string left that is not a dependency
                         if (allMavenDependencies.get(j).equals("[INFO] [ jar ]") || allMavenDependencies.get(j).equals("[INFO] [ pom ]")) {
                             allMavenDependencies.remove(j);
                         }
                     }
                 }
 
+                //change dependency type from string to artifact
                 for (int i = 0; i < allMavenDependencies.size(); i++) {
                     allArtifacts.add(buildArtifactFromString(allMavenDependencies, i));
                 }
@@ -143,7 +145,6 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
 
                 List<String> commandLineInfos = new ArrayList<>();
 
-
                 try {
 
                     invoker.setOutputHandler(new InvocationOutputHandler() {
@@ -153,9 +154,9 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                                 logger.info(line);
                                 unusedMavenDependencies.add(line);
                                 commandLineInfos.add(line);
-                                //spring boot only autoconfigures different things  by adding the corresponding dependency
+                                //"spring boot only autoconfigures different things  by adding the corresponding dependency
                                 // and this configuration is happening outside of the application code, thus everything related
-                                //to springframework will be ignored,
+                                //to springframework will be ignored"
                                 //for more see https://stackoverflow.com/questions/37528928/spring-boot-core-dependencies-seen-as-unused-by-maven-dependency-plugin
                             } else if (line.startsWith("[WARNING]    ") && !line.contains("org.springframework")) {
                                 unusedMavenDependencies.add(line);
@@ -183,8 +184,6 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
 
                 for (String element : unusedMavenDependencies) {
                     if (element.startsWith("[ERROR")) {
-                        //when all repositories have been analyzed, the log will display the amount of projects that have been skipped
-                        // because of a build failure
                         buildFailures++;
                         return new AnalysisResultWithoutProcessing(repositoryInformation, getUniqueName());
                     }
@@ -198,17 +197,18 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                     List<String> completeList = new ArrayList<>();
                     for (String commandLineInfo : commandLineInfos) {
                         if (commandLineInfo.contains("@")) {
-                            String t = StringUtils.substringBetween(commandLineInfo, "@", "---").trim();
-                            completeList.add(t);
+                            //this string contains the module
+                            String module = StringUtils.substringBetween(commandLineInfo, "@", "---").trim();
+                            completeList.add(module);
                         } else if (commandLineInfo.contains("No dependency problems")) {
-                            String u = StringUtils.substringBetween(commandLineInfo, "[INFO]", "found");
-                            completeList.add(u);
+                            String noDepProblem = StringUtils.substringBetween(commandLineInfo, "[INFO]", "found");
+                            completeList.add(noDepProblem);
                         } else if (commandLineInfo.contains("Skipping pom project")) {
-                            String u = StringUtils.substringBetween(commandLineInfo, "[INFO]", "project");
-                            completeList.add(u);
+                            String skipPom = StringUtils.substringBetween(commandLineInfo, "[INFO]", "project");
+                            completeList.add(skipPom);
                         } else if (commandLineInfo.contains("[WARNING]")) {
-                            String u = StringUtils.substringBetween(commandLineInfo, "[WARNING]", "dependencies");
-                            completeList.add(u);
+                            String unusedOrUndeclaredDep = StringUtils.substringBetween(commandLineInfo, "[WARNING]", "dependencies");
+                            completeList.add(unusedOrUndeclaredDep);
                         }
                     }
 
@@ -236,7 +236,7 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                         }
                     }
 
-                    // transforms every module from current multi-module project into an Artifact for easier processing
+                    // transforms every module from current multi-module project into a dummy Artifact for easier processing
                     for (int i = 0; i < completeList.size(); i++) {
                         transformModuletoArtifact.add(i, new DefaultArtifact("org.dummy", completeList.get(i), "No version", null, "jar", null, new DefaultArtifactHandler()));
                     }
@@ -252,6 +252,7 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                     for (int i = getUnusedDependencyIndex(unusedMavenDependencies, mavenText); i < unusedMavenDependencies.size(); i++) {
                         if (unusedMavenDependencies.get(i).contains("[WARNING] Unused declared dependencies found:")) {
                             unusedPattern = true;
+                            //match modules with unused dependencies for multi-module projects
                             if (!project.getModel().getModules().isEmpty()) {
                                 unusedArtifacts.add(transformModuletoArtifact.get(moduleCounter));
                                 moduleCounter++;
@@ -267,25 +268,16 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                         }
                     }
                 }
-
-                //get rid of duplicated unused Dependencies
-                //    Set<Artifact> noDuplicateUnusedArtifacts = new LinkedHashSet<>();
-
-                //   for (Artifact artifact : unusedArtifacts) {
-                //       noDuplicateUnusedArtifacts.add(artifact);
-                //   }
-                //convert set back to list for further processing
-                //    List<Artifact> noDuplicateUnusedDeps = new ArrayList(noDuplicateUnusedArtifacts);
-                //    logger.info("Liste ohne Duplikate: " + noDuplicateUnusedDeps);
                 return new MavenDependencyAnalysisResult(repositoryInformation, getUniqueName(), allArtifacts, unusedArtifacts, isMultiModule);
 
             case JAVA_SCRIPT:
                 File packageJSONFile = new File(repositoryInformation.getLocalDownloadPath() + JSON_FILE);
                 if (!packageJSONFile.exists()) {
-                    logger.info("We could not a find a package.json file for " + repositoryInformation.getName() + ", thus it will be excluded from the analysis.");
+                    logger.error("We could not a find a package.json file for " + repositoryInformation.getName() + ", thus it will be excluded from the analysis.");
                     return new AnalysisResultWithoutProcessing(repositoryInformation, getUniqueName());
                 }
 
+                //list all non transitive dependencies
                 ProcessBuilder pb = new ProcessBuilder("/bin/bash", "-c", "npm list -dev -prod -depth 0");
                 pb.directory(repositoryInformation.getLocalDownloadPath());
                 pb.redirectErrorStream(true);
@@ -314,6 +306,7 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
 
                         if (line == null) {
                             break;
+                            //all dependencies have these chars
                         } else if (line.contains("@") && line.charAt(1) == '─') {
                             allNodeDependencies.add(line);
                         }
@@ -325,9 +318,9 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                 }
                 ArrayList<String> nodeDependencies = new ArrayList<>();
                 int index = 0;
-                //ACHTUNG HIER AUF REMOVE REIHENFOLGE ACHTEN
                 for (int i = allNodeDependencies.size() - 1; i >= 0; i--) {
                     nodeDependencies.add(getNameOfDependency(allNodeDependencies, i));
+                    //if dependencies have an '@' at the start of their name, remove it
                     if (nodeDependencies.get(index).startsWith("@")) {
                         String s = nodeDependencies.get(index).substring(1);
                         nodeDependencies.remove(index);
@@ -404,9 +397,18 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
         return new AnalysisResultWithoutProcessing(repositoryInformation, getUniqueName());
     }
 
+    /**
+     * Returns the dependency substring from the command line string.
+     *
+     * @param allDependencies the list that contains all the command lines including the dependency.
+     *                        <b>Must not be <code>null</code></b>.
+     * @param i               the index of the element in the list.
+     * @return the dependency of the project for the current line. <b>Must not be <code>null</code></b>.
+     */
     private String getNameOfDependency(ArrayList<String> allDependencies, int i) {
         String dependency;
         String line = allDependencies.get(i);
+        //split the command line string at every whitespace and find the dependency string
         String[] splitValues = line.split("\\s");
         if (line.contains("OPTIONAL") || line.contains("PEER")) {
             return dependency = splitValues[4];
@@ -423,7 +425,14 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
         return dependency;
     }
 
-
+    /**
+     * Returns the index of the starting point for extracting unused dependencies.
+     *
+     * @param output        the list that contains the unused dependencies along other possible stuff like missing dependencies.
+     *                      <b>Must not be <code>null</code></b>.
+     * @param startingPoint the string to be searched for in the list.<b>Must not be <code>null</code> or empty</b>.
+     * @return the index of the starting point for extracting unused dependencies.
+     */
     private int getUnusedDependencyIndex(ArrayList<String> output, String startingPoint) {
         int index = 0;
         int counter = 0;
@@ -437,11 +446,19 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
         return index;
     }
 
+    /**
+     * Transforms the dependency of the type String into an Artifact and returns it.
+     *
+     * @param pluginOutput the list that contains all dependencies.
+     * @param unusedDependencyIndex the current index of the dependency to be transformed.
+     *
+     * @return the dependency that now has the reference type Artifact.
+     */
     private Artifact buildArtifactFromString(ArrayList<String> pluginOutput, int unusedDependencyIndex) {
         String line = pluginOutput.get(unusedDependencyIndex);
         String[] splitValues = line.split(":|\\s+");
         String groupId = splitValues[1];
-        String artifactId = splitValues[2];// ganz selten out of bounds?
+        String artifactId = splitValues[2];
         String type = splitValues[3];
         String version = splitValues[4];
         String scope = splitValues[5];
@@ -465,17 +482,25 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
         return transformModuletoArtifact;
     }
 
-
+    @Override
     public ProgrammingLanguage[] getLanguageThisPluginIsDesignedFor() {
         return new ProgrammingLanguage[]{ProgrammingLanguage.JAVA, ProgrammingLanguage.JAVA_SCRIPT};
     }
 
+    @Override
+    public void init(FrameworkManager frameworkManager) {
 
+    }
+
+    @Override
     public String getUniqueName() {
         return PLUGIN_NAME;
     }
 
+    @Override
     public void cleanUp() {
 
     }
+
+
 }
