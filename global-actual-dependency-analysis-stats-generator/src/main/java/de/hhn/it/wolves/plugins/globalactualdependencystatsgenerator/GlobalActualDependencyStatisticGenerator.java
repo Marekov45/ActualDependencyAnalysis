@@ -13,6 +13,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -77,7 +78,7 @@ public class GlobalActualDependencyStatisticGenerator implements TwoPhasesStatis
             logger.info("For " + repository.getRepositoryInformation().getName() + " we found the following unused Dependencies:" + unusedDependencies);
         }
         List<String> csvLines = new ArrayList<>();
-        csvLines.add("Name of Repository;Programming language;Dependency count;Unused;Multi-Module");
+        csvLines.add("Name of Repository;Programming language;Dependencies count;Unused;Multi-Module");
         for (Repo repository : repositories) {
             StringBuilder sb = new StringBuilder(repository.getRepositoryInformation().getName());
             sb.append(separator).append(repository.getRepositoryInformation().getProgrammingLanguage());
@@ -131,7 +132,7 @@ public class GlobalActualDependencyStatisticGenerator implements TwoPhasesStatis
             for (Artifact dependency : ((MavenDependencyStatisticInformation) statisticInformation).getAllForwardedMavenDependencies()) {
                 if (!((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().isEmpty()) {
                     for (Artifact unusedDependency : ((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies()) {
-                        //count projects with unused declared dependencies
+                        //count projects with unused declared dependencies and excludes dependencies that are a module of a multi-module project
                         if (unusedDependency.equals(dependency)) {
                             unusedDeps++;
                             return new GeneratedStatisticInformation(statisticInformation, null, getUniqueName());
@@ -233,4 +234,5 @@ public class GlobalActualDependencyStatisticGenerator implements TwoPhasesStatis
             return isMultiModule;
         }
     }
+
 }

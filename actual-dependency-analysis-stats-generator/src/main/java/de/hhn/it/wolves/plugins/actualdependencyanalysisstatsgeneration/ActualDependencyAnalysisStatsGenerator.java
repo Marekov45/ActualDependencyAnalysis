@@ -49,7 +49,7 @@ public class ActualDependencyAnalysisStatsGenerator implements StatisticGenerato
                     lines.add(sb.toString());
                 }
             } else if (((MavenDependencyStatisticInformation) statisticInformation).isMultiModule()) {
-                String moduleName = "";
+                String moduleName = " ";
                 //create copied list of unused dependencies so elements can be safely removed without changing the original list for global stats later
                 List<Artifact> unusedDepsCopy = new ArrayList<>();
                 for (int i = 0; i < ((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().size(); i++) {
@@ -87,7 +87,31 @@ public class ActualDependencyAnalysisStatsGenerator implements StatisticGenerato
                         }
                     }
                 }
+                //if a module of a multi module project is a dependency for a different module, the plugin might tag it as unused declared
+                // dependency even though it could be used. Additionally the module will never be found in the CVE database for further analysis
+                // since it is only a module of the current project. It will be excluded in the single repository stats.
+
+                for (int i = lines.size() - 1; i > 0; i--) {
+                    String[] dependencyName = lines.get(i).split(";");
+                    logger.info("Hier die Artifact ID des Moduls:"+ dependencyName[0]);
+                    logger.info("Welche Module sind überhaupt da?: "+ ActualDependencyAnalyserPlugin.getTransformedModules());
+                    for (String module : ActualDependencyAnalyserPlugin.getListOfAllModules()) {
+                        logger.info("Array: " + Arrays.asList(dependencyName));
+                        if (dependencyName[0].equals(module) && Arrays.asList(dependencyName).contains("X")) {
+                            logger.info("Line die removed wird: "+ lines.get(i));
+                            for(int j=((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().size()-1; j>=0;j--){
+                                if(((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().get(j).getArtifactId().contains(dependencyName[0])){
+                                    ((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().remove(j);
+                                }
+                            }
+
+                            lines.remove(i);
+                        }
+                    }
+
+                }
                 logger.info("List of all unused Dependencies: " + ((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies());
+
             }
         } else if ((statisticInformation instanceof NodeDependencyStatisticInformation)) {
             for (String str : ((NodeDependencyStatisticInformation) statisticInformation).getAllForwardedNodeDependencies()) {
@@ -134,6 +158,8 @@ public class ActualDependencyAnalysisStatsGenerator implements StatisticGenerato
             } else {
                 writer = new BufferedWriter(new FileWriter(file.getAbsolutePath() + "/" + s + ".csv"));
             }
+
+
             //sort alphabetically for better overview
             Collections.sort(lines.subList(1, lines.size()));
             for (String string : lines) {

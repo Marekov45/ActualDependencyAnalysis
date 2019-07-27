@@ -32,6 +32,7 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
     private static int multiModule = 0; //counts multi module projects for global stats
     private static List<String> multiModuleProjects = new ArrayList<>(); //list for all multi module projects to be displayed in global stats
     private static List<Artifact> transformModuletoArtifact = new ArrayList<>();
+    private static ArrayList<String> listOfAllModules = new ArrayList<>(); //this list is needed for extracting modules that are used as dependencies and should not count towards stats
 
 
     @Override
@@ -154,11 +155,14 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                                 logger.info(line);
                                 unusedMavenDependencies.add(line);
                                 commandLineInfos.add(line);
+                                // only bytcode-analysis, classes that are loaded at runtime wont be recognized (jdbc driver etc.)
                                 //"spring boot only autoconfigures different things  by adding the corresponding dependency
                                 // and this configuration is happening outside of the application code, thus everything related
                                 //to springframework will be ignored"
                                 //for more see https://stackoverflow.com/questions/37528928/spring-boot-core-dependencies-seen-as-unused-by-maven-dependency-plugin
-                            } else if (line.startsWith("[WARNING]    ") && !line.contains("org.springframework")) {
+                            } else if (line.startsWith("[WARNING]    ") && !line.contains("org.springframework") && !line.contains("spring-boot")
+                                    && !line.contains("sql") && !line.contains("database") && !line.contains("lombok") && !line.contains("guava") && !line.contains("curator")
+                                    && !line.contains("springfox")) {
                                 unusedMavenDependencies.add(line);
                             } else if (line.startsWith("[ERROR]")) {
                                 logger.info("The build failed for the project" + repositoryInformation.getName() + ". It will be excluded from the analysis");
@@ -189,47 +193,48 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                     }
                 }
 
+
                 //check if project is multi module
                 if (!project.getModel().getModules().isEmpty()) {
                     multiModule++;
                     multiModuleProjects.add(repositoryInformation.getName());
                     isMultiModule = true;
-                    List<String> completeList = new ArrayList<>();
+                    List<String> completeCMDLogList = new ArrayList<>();
                     for (String commandLineInfo : commandLineInfos) {
                         if (commandLineInfo.contains("@")) {
                             //this string contains the module
                             String module = StringUtils.substringBetween(commandLineInfo, "@", "---").trim();
-                            completeList.add(module);
+                            completeCMDLogList.add(module);
+                            listOfAllModules.add(module);
                         } else if (commandLineInfo.contains("No dependency problems")) {
                             String noDepProblem = StringUtils.substringBetween(commandLineInfo, "[INFO]", "found");
-                            completeList.add(noDepProblem);
+                            completeCMDLogList.add(noDepProblem);
                         } else if (commandLineInfo.contains("Skipping pom project")) {
                             String skipPom = StringUtils.substringBetween(commandLineInfo, "[INFO]", "project");
-                            completeList.add(skipPom);
+                            completeCMDLogList.add(skipPom);
                         } else if (commandLineInfo.contains("[WARNING]")) {
                             String unusedOrUndeclaredDep = StringUtils.substringBetween(commandLineInfo, "[WARNING]", "dependencies");
-                            completeList.add(unusedOrUndeclaredDep);
+                            completeCMDLogList.add(unusedOrUndeclaredDep);
                         }
                     }
-
                     // removes every module from the current multi-module project that has no dependency problems, is packaged as a pom or
                     // only has used undeclared dependencies
-                    for (int i = completeList.size() - 1; i >= 0; ) {
-                        if (completeList.get(i).contains("No dependency problems") || completeList.get(i).contains("Skipping pom")) {
-                            completeList.remove(i);
-                            completeList.remove(i - 1);
+                    for (int i = completeCMDLogList.size() - 1; i >= 0; ) {
+                        if (completeCMDLogList.get(i).contains("No dependency problems") || completeCMDLogList.get(i).contains("Skipping pom")) {
+                            completeCMDLogList.remove(i);
+                            completeCMDLogList.remove(i - 1);
                             i -= 2;
-                        } else if (completeList.get(i).contains("Unused declared")) {
-                            completeList.remove(i);
-                            if (completeList.get(i - 1).contains("Used undeclared")) {
-                                completeList.remove(i - 1);
+                        } else if (completeCMDLogList.get(i).contains("Unused declared")) {
+                            completeCMDLogList.remove(i);
+                            if (completeCMDLogList.get(i - 1).contains("Used undeclared")) {
+                                completeCMDLogList.remove(i - 1);
                                 i -= 2;
                             } else {
                                 i -= 1;
                             }
-                        } else if (completeList.get(i).contains("Used undeclared")) {
-                            completeList.remove(i);
-                            completeList.remove(i - 1);
+                        } else if (completeCMDLogList.get(i).contains("Used undeclared")) {
+                            completeCMDLogList.remove(i);
+                            completeCMDLogList.remove(i - 1);
                             i -= 2;
                         } else {
                             i -= 1;
@@ -237,8 +242,8 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                     }
 
                     // transforms every module from current multi-module project into a dummy Artifact for easier processing
-                    for (int i = 0; i < completeList.size(); i++) {
-                        transformModuletoArtifact.add(i, new DefaultArtifact("org.dummy", completeList.get(i), "No version", null, "jar", null, new DefaultArtifactHandler()));
+                    for (int i = 0; i < completeCMDLogList.size(); i++) {
+                        transformModuletoArtifact.add(i, new DefaultArtifact("org.dummy", completeCMDLogList.get(i), "No version", null, "jar", null, new DefaultArtifactHandler()));
                     }
 
 
@@ -449,9 +454,8 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
     /**
      * Transforms the dependency of the type String into an Artifact and returns it.
      *
-     * @param pluginOutput the list that contains all dependencies.
+     * @param pluginOutput          the list that contains all dependencies.
      * @param unusedDependencyIndex the current index of the dependency to be transformed.
-     *
      * @return the dependency that now has the reference type Artifact.
      */
     private Artifact buildArtifactFromString(ArrayList<String> pluginOutput, int unusedDependencyIndex) {
@@ -480,6 +484,10 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
 
     public static List<Artifact> getTransformedModules() {
         return transformModuletoArtifact;
+    }
+
+    public static List<String> getListOfAllModules() {
+        return listOfAllModules;
     }
 
     @Override
