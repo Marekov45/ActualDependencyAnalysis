@@ -93,12 +93,12 @@ public class ActualDependencyAnalysisStatsGenerator implements StatisticGenerato
 
                 for (int i = lines.size() - 1; i > 0; i--) {
                     String[] dependencyName = lines.get(i).split(";");
-                    logger.info("Hier die Artifact ID des Moduls:"+ dependencyName[0]);
-                    logger.info("Welche Module sind überhaupt da?: "+ ActualDependencyAnalyserPlugin.getTransformedModules());
+                    logger.info("Artifact ID des Moduls:"+ dependencyName[0]);
+                    logger.info("Welche Module sind überhaupt vorhanden?: "+ ActualDependencyAnalyserPlugin.getTransformedModules());
                     for (String module : ActualDependencyAnalyserPlugin.getListOfAllModules()) {
                         logger.info("Array: " + Arrays.asList(dependencyName));
                         if (dependencyName[0].equals(module) && Arrays.asList(dependencyName).contains("X")) {
-                            logger.info("Line die removed wird: "+ lines.get(i));
+                            logger.info("Line die entfernt wird: "+ lines.get(i));
                             for(int j=((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().size()-1; j>=0;j--){
                                 if(((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().get(j).getArtifactId().contains(dependencyName[0])){
                                     ((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().remove(j);
