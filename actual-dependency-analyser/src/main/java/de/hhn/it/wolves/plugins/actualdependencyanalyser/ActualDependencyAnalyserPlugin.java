@@ -161,8 +161,8 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                                 //to springframework will be ignored"
                                 //for more see https://stackoverflow.com/questions/37528928/spring-boot-core-dependencies-seen-as-unused-by-maven-dependency-plugin
                             } else if (line.startsWith("[WARNING]    ") && !line.contains("org.springframework") && !line.contains("spring-boot")
-                                    && !line.contains("sql") && !line.contains("database") && !line.contains("lombok") && !line.contains("guava") && !line.contains("curator")
-                                    && !line.contains("springfox")) {
+                                    && !line.contains("mysql-connector-java") && !line.contains("sqlite-jdbc") && !line.contains("lombok") && !line.contains("guava") && !line.contains("curator")
+                                    && !line.contains("springfox") && !line.contains("postgresql") && !line.contains("com.h2database")) {
                                 unusedMavenDependencies.add(line);
                             } else if (line.startsWith("[ERROR]")) {
                                 logger.info("The build failed for the project" + repositoryInformation.getName() + ". It will be excluded from the analysis");
@@ -282,11 +282,39 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                     return new AnalysisResultWithoutProcessing(repositoryInformation, getUniqueName());
                 }
 
-                //list all non transitive dependencies
-                ProcessBuilder pb = new ProcessBuilder("/bin/bash", "-c", "npm list -dev -prod -depth 0");
+
+                ProcessBuilder pb = new ProcessBuilder("/bin/bash", "-c", "npm install");
                 pb.directory(repositoryInformation.getLocalDownloadPath());
                 pb.redirectErrorStream(true);
+                //  Process installProcess = null;
                 Process process = null;
+                try {
+                    process = pb.start();
+
+                } catch (IOException e) {
+
+                    e.printStackTrace();
+                }
+                BufferedReader installReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                String installOutput;
+                while (true) {
+                    try {
+                        if (!((installOutput = installReader.readLine()) != null)) break;
+                        logger.info("npm install output :" + installOutput);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                try {
+                    process.waitFor();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                //list all non transitive dependencies
+                pb.command("/bin/bash", "-c", "npm list -dev -prod -depth 0");
+
+                // Process process = null;
                 try {
                     process = pb.start();
                 } catch (IOException e) {
@@ -392,6 +420,7 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                 //if it doesnt contain the element it remains unchanged
                 unusedNodeDependencies.remove("Unused dependencies");
                 unusedNodeDependencies.remove("Unused devDependencies");
+
 
                 logger.info("Alle Dependencies:" + nodeDependencies);
                 logger.info("Unused Dependencies:" + unusedNodeDependencies);
