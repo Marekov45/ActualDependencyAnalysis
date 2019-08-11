@@ -5,6 +5,7 @@ import de.hhn.it.wolves.domain.*;
 import de.hhn.it.wolves.plugins.actualdependencyanalyser.ActualDependencyAnalyserPlugin;
 import de.hhn.it.wolves.plugins.actualdependencyanalysisprocessing.MavenDependencyStatisticInformation;
 import de.hhn.it.wolves.plugins.actualdependencyanalysisprocessing.NodeDependencyStatisticInformation;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,19 +59,27 @@ public class GlobalActualDependencyStatisticGenerator implements TwoPhasesStatis
                 }
             } else if (repository.getRepositoryInformation().getProgrammingLanguage().equals(ProgrammingLanguage.JAVA_SCRIPT)) {
                 for (String str : repository.getDepcheckDependencies()) {
+                    int count = StringUtils.countMatches(str,"@");
                     String[] allSplitValues = str.split("@");
-                    String dependency = allSplitValues[0];
+                    String dependency;
+                    if (count == 2) {
+                        dependency = "@" + allSplitValues[1];
+                    } else {
+                        dependency = allSplitValues[0];
+                    }
+                   // String[] allSplitValues = str.split("@");
+                   // String dependency = allSplitValues[0];
                     for (String str1 : repository.getUnusedDepcheckDependencies()) {
-                        if (!str1.contains("*")) {
-                            if (str1.equals(dependency)) {
-                                unusedDependencies += "\n-" + str1;
-                            }
-                        } else {
+                   //     if (!str1.contains("*")) {
+                   //         if (str1.equals(dependency)) {
+                   //             unusedDependencies += "\n-" + str1;
+                   //         }
+                   //     } else {
                             String[] unusedSplitValues = str1.split("\\s");
                             if (unusedSplitValues[1].equals(dependency)) {
                                 unusedDependencies += "\n-" + unusedSplitValues[1];
                             }
-                        }
+                      //  }
                     }
 
                 }
@@ -143,22 +152,29 @@ public class GlobalActualDependencyStatisticGenerator implements TwoPhasesStatis
         } else if ((statisticInformation instanceof NodeDependencyStatisticInformation)) {
             repositories.add(new Repo(statisticInformation.getRepositoryInformation(), null, null, ((NodeDependencyStatisticInformation) statisticInformation).getAllForwardedNodeDependencies(), ((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies(), false));
             for (String str : ((NodeDependencyStatisticInformation) statisticInformation).getAllForwardedNodeDependencies()) {
+                int count = StringUtils.countMatches(str,"@");
                 String[] allSplitValues = str.split("@");
-                String dependency = allSplitValues[0];
+                String dependency;
+                if (count == 2) {
+                    dependency = "@" + allSplitValues[1];
+                } else {
+                    dependency = allSplitValues[0];
+                }
+             //   String dependency = allSplitValues[0];
                 if (!((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies().isEmpty() && !((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies().get(0).equals("No depcheck issue")) {
                     for (String unusedNodeDependency : ((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies()) {
-                        if (!unusedNodeDependency.contains("*")) {
-                            if (unusedNodeDependency.equals(dependency)) {
-                                unusedDeps++;
-                                return new GeneratedStatisticInformation(statisticInformation, null, getUniqueName());
-                            }
-                        } else {
+              //          if (!unusedNodeDependency.contains("*")) {
+             //               if (unusedNodeDependency.equals(dependency)) {
+              //                  unusedDeps++;
+              //                  return new GeneratedStatisticInformation(statisticInformation, null, getUniqueName());
+              //              }
+               //         } else {
                             String[] unusedSplitValues = unusedNodeDependency.split("\\s");
                             if (unusedSplitValues[1].equals(dependency)) {
                                 unusedDeps++;
                                 return new GeneratedStatisticInformation(statisticInformation, null, getUniqueName());
                             }
-                        }
+                    //    }
                     }
                 }
             }

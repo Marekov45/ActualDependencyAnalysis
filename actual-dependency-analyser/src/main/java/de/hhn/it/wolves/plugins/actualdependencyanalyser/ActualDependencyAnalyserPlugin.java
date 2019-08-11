@@ -349,19 +349,20 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
 
                 }
                 ArrayList<String> nodeDependencies = new ArrayList<>();
-                int index = 0;
+                //int index = 0;
                 for (int i = allNodeDependencies.size() - 1; i >= 0; i--) {
                     nodeDependencies.add(getNameOfDependency(allNodeDependencies, i));
                     //if dependencies have an '@' at the start of their name, remove it
-                    if (nodeDependencies.get(index).startsWith("@")) {
+                    //update: these are scoped packages, thats why they have an '@'
+                 /*   if (nodeDependencies.get(index).startsWith("@")) {
                         String s = nodeDependencies.get(index).substring(1);
                         nodeDependencies.remove(index);
                         nodeDependencies.add(s);
                     }
-                    index++;
+                    index++; */
                 }
                 //the command for getting all unused dependencies, ignore false positives
-                pb.command("/bin/bash", "-c", "depcheck --ignores=\"eslint-*,*-eslint\"  --skip-missing=true");
+                pb.command("/bin/bash", "-c", "depcheck --ignores=\"eslint*,*-eslint\"  --skip-missing=true");
                 Process depcheckProcess = null;
                 try {
                     depcheckProcess = pb.start();
@@ -402,12 +403,12 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                 int unusedIndexNoMissingDeps = 0;
                 for (int j = depcheckDependencies.size() - 1; j >= 0; j--) {
                     unusedNodeDependencies.add(depcheckDependencies.get(j));
-                    if (unusedNodeDependencies.get(unusedIndexNoMissingDeps).startsWith("* @")) {
+                  /*  if (unusedNodeDependencies.get(unusedIndexNoMissingDeps).startsWith("* @")) {
                         String s = unusedNodeDependencies.get(unusedIndexNoMissingDeps).substring(3);
                         unusedNodeDependencies.remove(unusedIndexNoMissingDeps);
                         unusedNodeDependencies.add(s);
                     }
-                    unusedIndexNoMissingDeps++;
+                    unusedIndexNoMissingDeps++; */
                 }
                 // }
                 //remove Error messages in List

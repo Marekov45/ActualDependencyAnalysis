@@ -7,6 +7,7 @@ import de.hhn.it.wolves.domain.StatisticInformation;
 import de.hhn.it.wolves.plugins.actualdependencyanalyser.ActualDependencyAnalyserPlugin;
 import de.hhn.it.wolves.plugins.actualdependencyanalysisprocessing.MavenDependencyStatisticInformation;
 import de.hhn.it.wolves.plugins.actualdependencyanalysisprocessing.NodeDependencyStatisticInformation;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,11 +95,11 @@ public class ActualDependencyAnalysisStatsGenerator implements StatisticGenerato
                 for (int i = lines.size() - 1; i > 0; i--) {
                     String[] dependencyName = lines.get(i).split(";");
                     logger.info("Artifact ID des Moduls:"+ dependencyName[0]);
-                    logger.info("Welche Module sind überhaupt vorhanden?: "+ ActualDependencyAnalyserPlugin.getTransformedModules());
+                    logger.info("Which modules are used?: "+ ActualDependencyAnalyserPlugin.getTransformedModules());
                     for (String module : ActualDependencyAnalyserPlugin.getListOfAllModules()) {
                         logger.info("Array: " + Arrays.asList(dependencyName));
                         if (dependencyName[0].equals(module) && Arrays.asList(dependencyName).contains("X")) {
-                            logger.info("Line die entfernt wird: "+ lines.get(i));
+                            logger.info("Line that will be removed: "+ lines.get(i));
                             for(int j=((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().size()-1; j>=0;j--){
                                 if(((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().get(j).getArtifactId().contains(dependencyName[0])){
                                     ((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().remove(j);
@@ -115,10 +116,20 @@ public class ActualDependencyAnalysisStatsGenerator implements StatisticGenerato
             }
         } else if ((statisticInformation instanceof NodeDependencyStatisticInformation)) {
             for (String str : ((NodeDependencyStatisticInformation) statisticInformation).getAllForwardedNodeDependencies()) {
-                String[] allSplitValues = str.split("@");
                 logger.info("Following line incoming " + str);
-                String dependency = allSplitValues[0];
-                String version = allSplitValues[1];
+                int count = StringUtils.countMatches(str,"@");
+                String[] allSplitValues = str.split("@");
+                String dependency;
+                String version;
+                if (count == 2) {
+                    dependency = "@" + allSplitValues[1];
+                    version = allSplitValues[2];
+                } else {
+                    dependency = allSplitValues[0];
+                    version = allSplitValues[1];
+                }
+              //  String dependency = allSplitValues[0];
+              //  String version = allSplitValues[1];
                 StringBuilder sb = new StringBuilder();
                 sb.append(dependency);
                 sb.append(separator).append(version);
@@ -126,13 +137,13 @@ public class ActualDependencyAnalysisStatsGenerator implements StatisticGenerato
                 if (!((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies().isEmpty() && !((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies().get(0).equals("No depcheck issue")) {
                     for (String unusedDependency : ((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies()) {
                         //dependencies that used an '@' infront of their name, had their * removed beforehand
-                        if (!unusedDependency.contains("*")) {
-                            logger.info("Apparently unused : " + unusedDependency);
-                            if (unusedDependency.equals(dependency)) {
-                                logger.info("Dependencies match! " + unusedDependency + " is unused");
-                                sb.append(separator).append("X");
-                            }
-                        } else {
+                   //     if (!unusedDependency.contains("*")) {
+                   //         logger.info("Apparently unused : " + unusedDependency);
+                   //         if (unusedDependency.equals(dependency)) {
+                   //             logger.info("Dependencies match! " + unusedDependency + " is unused");
+                   //             sb.append(separator).append("X");
+                   //         }
+                   //     } else {
                             //dependencies still have a '*' infront of their name and need to be split
                             logger.info("Apparently unused : " + unusedDependency);
                             String[] unusedSplitValues = unusedDependency.split("\\s");
@@ -140,7 +151,7 @@ public class ActualDependencyAnalysisStatsGenerator implements StatisticGenerato
                                 logger.info("Dependencies match! " + unusedSplitValues[1] + " is unused");
                                 sb.append(separator).append("X");
                             }
-                        }
+                  //      }
 
                     }
                     foundUnused = true;
