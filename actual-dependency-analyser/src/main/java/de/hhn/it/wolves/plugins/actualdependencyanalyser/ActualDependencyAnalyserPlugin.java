@@ -74,8 +74,6 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                 invoker.setMavenHome(new File("/usr/share/maven"));
                 //only list non transitive dependencies
                 request.setGoals(Collections.singletonList("-DexcludeTransitive=true dependency:list"));
-
-
                 ArrayList<String> allMavenDependencies = new ArrayList<>();
                 List<Artifact> allArtifacts = new ArrayList<>();
                 try {
@@ -155,11 +153,11 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                                 logger.info(line);
                                 unusedMavenDependencies.add(line);
                                 commandLineInfos.add(line);
-                                // only bytcode-analysis, classes that are loaded at runtime wont be recognized (jdbc driver etc.)
-                                //"spring boot only autoconfigures different things  by adding the corresponding dependency
-                                // and this configuration is happening outside of the application code, thus everything related
-                                //to springframework will be ignored"
-                                //for more see https://stackoverflow.com/questions/37528928/spring-boot-core-dependencies-seen-as-unused-by-maven-dependency-plugin
+                                /* only bytcode-analysis, classes that are loaded at runtime wont be recognized (jdbc driver etc.)
+                                   "spring boot only autoconfigures different things  by adding the corresponding dependency
+                                   and this configuration is happening outside of the application code, thus everything related
+                                   to springframework will be ignored"
+                                   for more see https://stackoverflow.com/questions/37528928/spring-boot-core-dependencies-seen-as-unused-by-maven-dependency-plugin */
                             } else if (line.startsWith("[WARNING]    ") && !line.contains("org.springframework") && !line.contains("spring-boot")
                                     && !line.contains("mysql-connector-java") && !line.contains("sqlite-jdbc") && !line.contains("lombok") && !line.contains("guava") && !line.contains("curator")
                                     && !line.contains("springfox") && !line.contains("postgresql") && !line.contains("com.h2database")) {
@@ -217,8 +215,8 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                             completeCMDLogList.add(unusedOrUndeclaredDep);
                         }
                     }
-                    // removes every module from the current multi-module project that has no dependency problems, is packaged as a pom or
-                    // only has used undeclared dependencies
+                    /* removes every module from the current multi-module project that has no dependency problems,
+                    is packaged as a pom or only has used undeclared dependencies */
                     for (int i = completeCMDLogList.size() - 1; i >= 0; ) {
                         if (completeCMDLogList.get(i).contains("No dependency problems") || completeCMDLogList.get(i).contains("Skipping pom")) {
                             completeCMDLogList.remove(i);
@@ -285,6 +283,7 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
 
                 ProcessBuilder pb = new ProcessBuilder("/bin/bash", "-c", "npm install");
                 pb.directory(repositoryInformation.getLocalDownloadPath());
+                //any error output will be merged with standard output so both can be read
                 pb.redirectErrorStream(true);
                 //  Process installProcess = null;
                 Process process = null;
@@ -361,8 +360,8 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                     }
                     index++;
                 }
-                //the command for getting all unused dependencies
-                pb.command("depcheck");
+                //the command for getting all unused dependencies, ignore false positives
+                pb.command("/bin/bash", "-c", "depcheck --ignores=\"eslint-*,*-eslint\"  --skip-missing=true");
                 Process depcheckProcess = null;
                 try {
                     depcheckProcess = pb.start();
@@ -386,30 +385,31 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                     depcheckDependencies.add(row);
                 }
                 ArrayList<String> unusedNodeDependencies = new ArrayList<>();
-                String depcheckText = "Missing dependencies";
-                if (depcheckDependencies.contains(depcheckText)) {
-                    int unusedindex = 0;
-                    for (int i = getUnusedDependencyIndex(depcheckDependencies, depcheckText) - 1; i >= 0; i--) {
-                        unusedNodeDependencies.add(depcheckDependencies.get(i));
-                        if (unusedNodeDependencies.get(unusedindex).startsWith("* @")) {
-                            String s = unusedNodeDependencies.get(unusedindex).substring(3);
-                            unusedNodeDependencies.remove(unusedindex);
-                            unusedNodeDependencies.add(s);
-                        }
-                        unusedindex++;
+                //not needed if depcheck ignores missing dependencies
+                /**  String depcheckText = "Missing dependencies";
+                 if (depcheckDependencies.contains(depcheckText)) {
+                 int unusedindex = 0;
+                 for (int i = getUnusedDependencyIndex(depcheckDependencies, depcheckText) - 1; i >= 0; i--) {
+                 unusedNodeDependencies.add(depcheckDependencies.get(i));
+                 if (unusedNodeDependencies.get(unusedindex).startsWith("* @")) {
+                 String s = unusedNodeDependencies.get(unusedindex).substring(3);
+                 unusedNodeDependencies.remove(unusedindex);
+                 unusedNodeDependencies.add(s);
+                 }
+                 unusedindex++;
+                 }
+                 } else { **/
+                int unusedIndexNoMissingDeps = 0;
+                for (int j = depcheckDependencies.size() - 1; j >= 0; j--) {
+                    unusedNodeDependencies.add(depcheckDependencies.get(j));
+                    if (unusedNodeDependencies.get(unusedIndexNoMissingDeps).startsWith("* @")) {
+                        String s = unusedNodeDependencies.get(unusedIndexNoMissingDeps).substring(3);
+                        unusedNodeDependencies.remove(unusedIndexNoMissingDeps);
+                        unusedNodeDependencies.add(s);
                     }
-                } else {
-                    int unusedIndexNoMissingDeps = 0;
-                    for (int j = depcheckDependencies.size() - 1; j >= 0; j--) {
-                        unusedNodeDependencies.add(depcheckDependencies.get(j));
-                        if (unusedNodeDependencies.get(unusedIndexNoMissingDeps).startsWith("* @")) {
-                            String s = unusedNodeDependencies.get(unusedIndexNoMissingDeps).substring(3);
-                            unusedNodeDependencies.remove(unusedIndexNoMissingDeps);
-                            unusedNodeDependencies.add(s);
-                        }
-                        unusedIndexNoMissingDeps++;
-                    }
+                    unusedIndexNoMissingDeps++;
                 }
+                // }
                 //remove Error messages in List
                 for (int i = nodeDependencies.size() - 1; i >= 0; i--) {
                     String errorMessage = nodeDependencies.get(i);
@@ -428,7 +428,9 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
         }
 
         logger.error("This part should never been reached");
-        return new AnalysisResultWithoutProcessing(repositoryInformation, getUniqueName());
+        return new
+
+                AnalysisResultWithoutProcessing(repositoryInformation, getUniqueName());
     }
 
     /**

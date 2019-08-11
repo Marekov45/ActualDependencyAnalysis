@@ -27,21 +27,21 @@ public class ActualDependencyAnalysisStatsGenerator implements StatisticGenerato
 
     @Override
     public GeneratedStatisticInformation generateStatistic(File file, String s, StatisticInformation statisticInformation) {
-        String seperator = ";";
+        String separator = ";";
         List<String> lines = new ArrayList<>();
-        lines.add("Dependency;Version;Module;Unused");
+        lines.add("Name der Bibliothek;Version;Module;Unbenutzt");
         boolean foundUnused = false;
         if ((statisticInformation instanceof MavenDependencyStatisticInformation)) {
             if (!((MavenDependencyStatisticInformation) statisticInformation).isMultiModule()) {
                 for (Artifact artifact : ((MavenDependencyStatisticInformation) statisticInformation).getAllForwardedMavenDependencies()) {
                     StringBuilder sb = new StringBuilder(artifact.getArtifactId());
-                    sb.append(seperator).append(artifact.getVersion());
-                    sb.append(seperator).append(" ");
+                    sb.append(separator).append(artifact.getVersion());
+                    sb.append(separator).append(" ");
                     // check if the repo has any unused dependencies
                     if (!((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().isEmpty()) {
                         for (Artifact artifact2 : ((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies()) {
                             if (artifact2.equals(artifact)) {
-                                sb.append(seperator).append("X");
+                                sb.append(separator).append("X");
                             }
                         }
                         foundUnused = true;
@@ -57,9 +57,9 @@ public class ActualDependencyAnalysisStatsGenerator implements StatisticGenerato
                 }
                 for (Artifact artifact : ((MavenDependencyStatisticInformation) statisticInformation).getAllForwardedMavenDependencies()) {
                     StringBuilder builder = new StringBuilder(artifact.getArtifactId());
-                    builder.append(seperator).append(artifact.getVersion());
+                    builder.append(separator).append(artifact.getVersion());
                     if (((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().isEmpty()) {
-                        builder.append(seperator).append(" ");
+                        builder.append(separator).append(" ");
                     } else {
                         //this part checks in which module the unused declared dependency is used in a multi-module project
                         for (Iterator<Artifact> iterator = unusedDepsCopy.iterator(); iterator.hasNext(); ) {
@@ -68,8 +68,8 @@ public class ActualDependencyAnalysisStatsGenerator implements StatisticGenerato
                                 moduleName = module.getArtifactId();
                             } else {
                                 if (module.equals(artifact)) {
-                                    builder.append(seperator).append(moduleName);
-                                    builder.append(seperator).append("X");
+                                    builder.append(separator).append(moduleName);
+                                    builder.append(separator).append("X");
                                     iterator.remove();
                                     break;
                                 }
@@ -121,7 +121,8 @@ public class ActualDependencyAnalysisStatsGenerator implements StatisticGenerato
                 String version = allSplitValues[1];
                 StringBuilder sb = new StringBuilder();
                 sb.append(dependency);
-                sb.append(seperator).append(version);
+                sb.append(separator).append(version);
+                sb.append(separator).append(" "); //JavaScript has no Multi-Module mechanism
                 if (!((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies().isEmpty() && !((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies().get(0).equals("No depcheck issue")) {
                     for (String unusedDependency : ((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies()) {
                         //dependencies that used an '@' infront of their name, had their * removed beforehand
@@ -129,7 +130,7 @@ public class ActualDependencyAnalysisStatsGenerator implements StatisticGenerato
                             logger.info("Apparently unused : " + unusedDependency);
                             if (unusedDependency.equals(dependency)) {
                                 logger.info("Dependencies match! " + unusedDependency + " is unused");
-                                sb.append(seperator).append("X");
+                                sb.append(separator).append("X");
                             }
                         } else {
                             //dependencies still have a '*' infront of their name and need to be split
@@ -137,7 +138,7 @@ public class ActualDependencyAnalysisStatsGenerator implements StatisticGenerato
                             String[] unusedSplitValues = unusedDependency.split("\\s");
                             if (unusedSplitValues[1].equals(dependency)) {
                                 logger.info("Dependencies match! " + unusedSplitValues[1] + " is unused");
-                                sb.append(seperator).append("X");
+                                sb.append(separator).append("X");
                             }
                         }
 

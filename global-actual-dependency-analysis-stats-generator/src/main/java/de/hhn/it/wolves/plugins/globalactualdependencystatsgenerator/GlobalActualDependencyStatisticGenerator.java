@@ -78,7 +78,7 @@ public class GlobalActualDependencyStatisticGenerator implements TwoPhasesStatis
             logger.info("For " + repository.getRepositoryInformation().getName() + " we found the following unused Dependencies:" + unusedDependencies);
         }
         List<String> csvLines = new ArrayList<>();
-        csvLines.add("Name of Repository;Programming language;Dependencies count;Unused;Multi-Module");
+        csvLines.add("Name des Repositories;Programmiersprache;Anzahl der Bibliotheken;Anzahl unbenutzter Bibliotheken;Multi-Module");
         for (Repo repository : repositories) {
             StringBuilder sb = new StringBuilder(repository.getRepositoryInformation().getName());
             sb.append(separator).append(repository.getRepositoryInformation().getProgrammingLanguage());
