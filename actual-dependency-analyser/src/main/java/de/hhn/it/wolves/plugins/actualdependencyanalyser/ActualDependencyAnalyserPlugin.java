@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Marvin Rekovsky on 11.06.19.
@@ -274,6 +275,7 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                 return new MavenDependencyAnalysisResult(repositoryInformation, getUniqueName(), allArtifacts, unusedArtifacts, isMultiModule);
 
             case JAVA_SCRIPT:
+                logger.info(repositoryInformation.getName() +" is a JavaScript project!");
                 File packageJSONFile = new File(repositoryInformation.getLocalDownloadPath() + JSON_FILE);
                 if (!packageJSONFile.exists()) {
                     logger.error("We could not a find a package.json file for " + repositoryInformation.getName() + ", thus it will be excluded from the analysis.");
@@ -300,12 +302,21 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                     try {
                         if (!((installOutput = installReader.readLine()) != null)) break;
                         logger.info("npm install output :" + installOutput);
+                        if(installOutput.contains("ERR!")){
+                            logger.error("Error occurred while trying to install dependencies. " + repositoryInformation.getName() + " will be excluded from the analysis.");
+                            return new AnalysisResultWithoutProcessing(repositoryInformation, getUniqueName());
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
                 try {
-                    process.waitFor();
+                    if(!process.waitFor(20, TimeUnit.MINUTES)) {
+                        //timeout - kill the process.
+                        process.destroyForcibly(); // consider using destroyForcibly instead
+                        logger.error("Process took too long to execute. " + repositoryInformation.getName() + " will be excluded from the analysis.");
+                        return new AnalysisResultWithoutProcessing(repositoryInformation, getUniqueName());
+                    }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -316,10 +327,18 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                 // Process process = null;
                 try {
                     process = pb.start();
+                    if(!process.waitFor(20, TimeUnit.MINUTES)) {
+                        //timeout - kill the process.
+                        process.destroyForcibly(); // consider using destroyForcibly instead
+                        logger.error("Process took too long to execute. " + repositoryInformation.getName() + " will be excluded from the analysis.");
+                        return new AnalysisResultWithoutProcessing(repositoryInformation, getUniqueName());
+                    }
                 } catch (IOException e) {
                     logger.error("We could not start the current process! Either the command is not a valid system operating command or" +
                             "the working directory does not exist.", e);
                     return new AnalysisResultWithoutProcessing(repositoryInformation, getUniqueName());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
                 BufferedReader input = new BufferedReader((new InputStreamReader(process.getInputStream())));
                 ArrayList<String> allNodeDependencies = new ArrayList<>();
@@ -336,8 +355,7 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                         line = input.readLine();
                         logger.info("npm run information:" + line);
 
-                        if (line == null) {
-                            break;
+                        if (line == null) {  break;
                             //all dependencies have these chars
                         } else if (line.contains("@") && line.charAt(1) == '─') {
                             allNodeDependencies.add(line);
@@ -362,13 +380,21 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                     index++; */
                 }
                 //the command for getting all unused dependencies, ignore false positives
-                pb.command("/bin/bash", "-c", "depcheck --ignores=\"eslint*,*-eslint\"  --skip-missing=true");
+                pb.command("/bin/bash", "-c", "depcheck --ignores=\"eslint-*,*-eslint,babel-*,*-babel,*-loader\"  --skip-missing=true");
                 Process depcheckProcess = null;
                 try {
                     depcheckProcess = pb.start();
+                    if(!depcheckProcess.waitFor(20, TimeUnit.MINUTES)) {
+                        //timeout - kill the process.
+                        process.destroyForcibly(); // consider using destroyForcibly instead
+                        logger.error("Process took too long to execute. " + repositoryInformation.getName() + " will be excluded from the analysis.");
+                        return new AnalysisResultWithoutProcessing(repositoryInformation, getUniqueName());
+                    }
                 } catch (IOException e) {
                     logger.error("We could not start the current process! The command is most likely not a valid system operating command.", e);
                     return new AnalysisResultWithoutProcessing(repositoryInformation, getUniqueName());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
                 BufferedReader reader = new BufferedReader(new InputStreamReader(depcheckProcess.getInputStream()));
 
@@ -385,6 +411,7 @@ public class ActualDependencyAnalyserPlugin implements AnalysisPlugin {
                     }
                     depcheckDependencies.add(row);
                 }
+
                 ArrayList<String> unusedNodeDependencies = new ArrayList<>();
                 //not needed if depcheck ignores missing dependencies
                 /**  String depcheckText = "Missing dependencies";
