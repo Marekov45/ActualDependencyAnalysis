@@ -91,17 +91,15 @@ public class ActualDependencyAnalysisStatsGenerator implements StatisticGenerato
                 //if a module of a multi module project is a dependency for a different module, the plugin might tag it as unused declared
                 // dependency even though it could be used. Additionally the module will never be found in the CVE database for further analysis
                 // since it is only a module of the current project. It will be excluded in the single repository stats.
-
                 for (int i = lines.size() - 1; i > 0; i--) {
                     String[] dependencyName = lines.get(i).split(";");
-                    logger.info("Artifact ID des Moduls:"+ dependencyName[0]);
-                    logger.info("Which modules are used?: "+ ActualDependencyAnalyserPlugin.getTransformedModules());
+                    logger.info("Artifact ID of the module:" + dependencyName[0]);
+                    logger.info("What modules are used?: " + ActualDependencyAnalyserPlugin.getTransformedModules());
                     for (String module : ActualDependencyAnalyserPlugin.getListOfAllModules()) {
-                        logger.info("Array: " + Arrays.asList(dependencyName));
                         if (dependencyName[0].equals(module) && Arrays.asList(dependencyName).contains("X")) {
-                            logger.info("Line that will be removed: "+ lines.get(i));
-                            for(int j=((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().size()-1; j>=0;j--){
-                                if(((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().get(j).getArtifactId().contains(dependencyName[0])){
+                            logger.info("Line that will be removed: " + lines.get(i));
+                            for (int j = ((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().size() - 1; j >= 0; j--) {
+                                if (((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().get(j).getArtifactId().contains(dependencyName[0])) {
                                     ((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().remove(j);
                                 }
                             }
@@ -117,7 +115,7 @@ public class ActualDependencyAnalysisStatsGenerator implements StatisticGenerato
         } else if ((statisticInformation instanceof NodeDependencyStatisticInformation)) {
             for (String str : ((NodeDependencyStatisticInformation) statisticInformation).getAllForwardedNodeDependencies()) {
                 logger.info("Following line incoming " + str);
-                int count = StringUtils.countMatches(str,"@");
+                int count = StringUtils.countMatches(str, "@");
                 String[] allSplitValues = str.split("@");
                 String dependency;
                 String version;
@@ -128,36 +126,24 @@ public class ActualDependencyAnalysisStatsGenerator implements StatisticGenerato
                     dependency = allSplitValues[0];
                     version = allSplitValues[1];
                 }
-              //  String dependency = allSplitValues[0];
-              //  String version = allSplitValues[1];
+                //  String dependency = allSplitValues[0];
+                //  String version = allSplitValues[1];
                 StringBuilder sb = new StringBuilder();
                 sb.append(dependency);
                 sb.append(separator).append(version);
                 sb.append(separator).append(" "); //JavaScript has no Multi-Module mechanism
                 if (!((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies().isEmpty() && !((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies().get(0).equals("No depcheck issue")) {
                     for (String unusedDependency : ((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies()) {
-                        //dependencies that used an '@' infront of their name, had their * removed beforehand
-                   //     if (!unusedDependency.contains("*")) {
-                   //         logger.info("Apparently unused : " + unusedDependency);
-                   //         if (unusedDependency.equals(dependency)) {
-                   //             logger.info("Dependencies match! " + unusedDependency + " is unused");
-                   //             sb.append(separator).append("X");
-                   //         }
-                   //     } else {
-                            //dependencies still have a '*' infront of their name and need to be split
-                            logger.info("Apparently unused : " + unusedDependency);
-                            String[] unusedSplitValues = unusedDependency.split("\\s");
-                            if (unusedSplitValues[1].equals(dependency)) {
-                                logger.info("Dependencies match! " + unusedSplitValues[1] + " is unused");
-                                sb.append(separator).append("X");
-                            }
-                  //      }
-
+                        logger.info("Apparently unused : " + unusedDependency);
+                        String[] unusedSplitValues = unusedDependency.split("\\s");
+                        if (unusedSplitValues[1].equals(dependency)) {
+                            logger.info("Dependencies match! " + unusedSplitValues[1] + " is unused");
+                            sb.append(separator).append("X");
+                        }
                     }
                     foundUnused = true;
                 }
                 lines.add(sb.toString());
-
             }
         } else {
             logger.error("I got an statistic information that I am not designed for!");

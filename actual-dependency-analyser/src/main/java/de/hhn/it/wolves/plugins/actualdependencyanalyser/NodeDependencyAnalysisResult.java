@@ -2,7 +2,6 @@ package de.hhn.it.wolves.plugins.actualdependencyanalyser;
 
 import de.hhn.it.wolves.domain.AnalysisResult;
 import de.hhn.it.wolves.domain.RepositoryInformation;
-import org.apache.maven.artifact.Artifact;
 
 import java.util.List;
 

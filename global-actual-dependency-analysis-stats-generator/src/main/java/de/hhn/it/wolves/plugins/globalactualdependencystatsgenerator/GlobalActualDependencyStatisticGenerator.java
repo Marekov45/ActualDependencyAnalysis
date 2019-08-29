@@ -14,7 +14,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -30,6 +29,7 @@ public class GlobalActualDependencyStatisticGenerator implements TwoPhasesStatis
     private final Set<Repo> repositories = new HashSet<>();
     private int unusedDeps;
     private int noUnusedDeps;
+    private static final int DEPENDENCY_INDEX = 1;
 
 
     @Override
@@ -37,11 +37,11 @@ public class GlobalActualDependencyStatisticGenerator implements TwoPhasesStatis
         String separator = ";";
         String allMultiModuleProjects = "";
         logger.info("WE FOUND:\n{} projects with unused dependencies\n{} projects without unused dependencies", unusedDeps, noUnusedDeps);
-        logger.info(ActualDependencyAnalyserPlugin.getBuildFailures() + " projects had a build failure and were excluded from the analysis.");
+        logger.info(ActualDependencyAnalyserPlugin.getBuildFailuresCounter() + " projects had a build failure and were excluded from the analysis.");
         for (int i = 0; i < ActualDependencyAnalyserPlugin.getMultiModuleProjects().size(); i++) {
             allMultiModuleProjects += "\n-" + ActualDependencyAnalyserPlugin.getMultiModuleProjects().get(i);
         }
-        logger.info("We found " + ActualDependencyAnalyserPlugin.getMultiModule() + " of the following projects that have multiple modules: " + allMultiModuleProjects);
+        logger.info("We found " + ActualDependencyAnalyserPlugin.getMultiModuleProjectCounter() + " of the following projects that have multiple modules: " + allMultiModuleProjects);
 
         for (Repo repository : repositories) {
             String unusedDependencies = "";
@@ -58,28 +58,24 @@ public class GlobalActualDependencyStatisticGenerator implements TwoPhasesStatis
                     }
                 }
             } else if (repository.getRepositoryInformation().getProgrammingLanguage().equals(ProgrammingLanguage.JAVA_SCRIPT)) {
-                for (String str : repository.getDepcheckDependencies()) {
-                    int count = StringUtils.countMatches(str,"@");
-                    String[] allSplitValues = str.split("@");
+                for (String allDependencies : repository.getDepcheckDependencies()) {
+                    int count = StringUtils.countMatches(allDependencies, "@");
+                    String[] allSplitValues = allDependencies.split("@");
                     String dependency;
                     if (count == 2) {
                         dependency = "@" + allSplitValues[1];
                     } else {
                         dependency = allSplitValues[0];
                     }
-                   // String[] allSplitValues = str.split("@");
-                   // String dependency = allSplitValues[0];
-                    for (String str1 : repository.getUnusedDepcheckDependencies()) {
-                   //     if (!str1.contains("*")) {
-                   //         if (str1.equals(dependency)) {
-                   //             unusedDependencies += "\n-" + str1;
-                   //         }
-                   //     } else {
-                            String[] unusedSplitValues = str1.split("\\s");
+                    for (String unusedDependency : repository.getUnusedDepcheckDependencies()) {
+                        String[] unusedSplitValues = unusedDependency.split("\\s");
+                        //if the unused dependency doesnt have the * character at the beginning, it should be ignored
+                        if (unusedSplitValues[0].equals("*") && DEPENDENCY_INDEX < unusedSplitValues.length) {
                             if (unusedSplitValues[1].equals(dependency)) {
                                 unusedDependencies += "\n-" + unusedSplitValues[1];
                             }
-                      //  }
+                        }
+                        //  }
                     }
 
                 }
@@ -129,7 +125,7 @@ public class GlobalActualDependencyStatisticGenerator implements TwoPhasesStatis
                 try {
                     writer.close();
                 } catch (IOException e) {
-                    logger.error("We could not close the buffered writer. Maybe data will be lost or not generated!",e);
+                    logger.error("We could not close the buffered writer. Maybe data will be lost or not generated!", e);
                 }
         }
     }
@@ -141,7 +137,6 @@ public class GlobalActualDependencyStatisticGenerator implements TwoPhasesStatis
             for (Artifact dependency : ((MavenDependencyStatisticInformation) statisticInformation).getAllForwardedMavenDependencies()) {
                 if (!((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies().isEmpty()) {
                     for (Artifact unusedDependency : ((MavenDependencyStatisticInformation) statisticInformation).getUnusedForwardedMavenDependencies()) {
-                        //count projects with unused declared dependencies and excludes dependencies that are a module of a multi-module project
                         if (unusedDependency.equals(dependency)) {
                             unusedDeps++;
                             return new GeneratedStatisticInformation(statisticInformation, null, getUniqueName());
@@ -151,30 +146,25 @@ public class GlobalActualDependencyStatisticGenerator implements TwoPhasesStatis
             }
         } else if ((statisticInformation instanceof NodeDependencyStatisticInformation)) {
             repositories.add(new Repo(statisticInformation.getRepositoryInformation(), null, null, ((NodeDependencyStatisticInformation) statisticInformation).getAllForwardedNodeDependencies(), ((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies(), false));
-            for (String str : ((NodeDependencyStatisticInformation) statisticInformation).getAllForwardedNodeDependencies()) {
-                int count = StringUtils.countMatches(str,"@");
-                String[] allSplitValues = str.split("@");
+            for (String allDependencies : ((NodeDependencyStatisticInformation) statisticInformation).getAllForwardedNodeDependencies()) {
+                int count = StringUtils.countMatches(allDependencies, "@");
+                String[] allSplitValues = allDependencies.split("@");
                 String dependency;
                 if (count == 2) {
                     dependency = "@" + allSplitValues[1];
                 } else {
                     dependency = allSplitValues[0];
                 }
-             //   String dependency = allSplitValues[0];
                 if (!((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies().isEmpty() && !((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies().get(0).equals("No depcheck issue")) {
                     for (String unusedNodeDependency : ((NodeDependencyStatisticInformation) statisticInformation).getUnusedForwardedNodeDependencies()) {
-              //          if (!unusedNodeDependency.contains("*")) {
-             //               if (unusedNodeDependency.equals(dependency)) {
-              //                  unusedDeps++;
-              //                  return new GeneratedStatisticInformation(statisticInformation, null, getUniqueName());
-              //              }
-               //         } else {
-                            String[] unusedSplitValues = unusedNodeDependency.split("\\s");
+                        String[] unusedSplitValues = unusedNodeDependency.split("\\s");
+                        if (DEPENDENCY_INDEX < unusedSplitValues.length) {
+                            logger.info("Array is fine!");
                             if (unusedSplitValues[1].equals(dependency)) {
                                 unusedDeps++;
                                 return new GeneratedStatisticInformation(statisticInformation, null, getUniqueName());
                             }
-                    //    }
+                        }
                     }
                 }
             }

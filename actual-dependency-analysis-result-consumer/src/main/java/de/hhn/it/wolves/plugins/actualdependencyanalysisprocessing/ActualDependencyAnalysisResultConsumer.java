@@ -17,14 +17,13 @@ public class ActualDependencyAnalysisResultConsumer implements AnalysisResultCon
     private static final String PLUGIN_NAME = "Actual dependency analysis RC";
     private static final Logger logger = LoggerFactory.getLogger(ActualDependencyAnalysisResultConsumer.class.getName());
 
-
     @Override
     public StatisticInformation processAnalysisResults(AnalysisResult analysisResult) {
         if ((analysisResult instanceof MavenDependencyAnalysisResult)) {
-            logger.info("I got a Maven dependency analysis result. We will forward it to the correspondent statistic generator plugin!");
+            logger.info("I got a maven dependency analysis result. We will forward it to the correspondent statistic generator plugin!");
             return new MavenDependencyStatisticInformation(analysisResult, getUniqueName(),((MavenDependencyAnalysisResult) analysisResult).getAllMavenDependencies(),((MavenDependencyAnalysisResult) analysisResult).getUnusedMavenDependencies(),((MavenDependencyAnalysisResult) analysisResult).isMultiModule());
         } else if ((analysisResult instanceof NodeDependencyAnalysisResult)) {
-            logger.info("I got a Nodejs dependency analysis result. We will forward it to the correspondent statistic generator plugin!");
+            logger.info("I got a javascript dependency analysis result. We will forward it to the correspondent statistic generator plugin!");
             return new NodeDependencyStatisticInformation(analysisResult,getUniqueName(),((NodeDependencyAnalysisResult) analysisResult).getAllNodeDependencies(), ((NodeDependencyAnalysisResult) analysisResult).getUnusedNodeDependencies(),((NodeDependencyAnalysisResult) analysisResult).isMultiModule());
         } else {
             logger.error("I got an analysis result that I am not designed for!");
